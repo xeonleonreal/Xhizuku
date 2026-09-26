@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Testing Shizuku Connector..."
-OUTPUT=$(adb shell content query --uri content://moe.shizuku.privileged.api.connector)
+OUTPUT=$(adb shell content query --uri content://xeonleon.xhizuku.connector)
 echo "Content Provider Output: $OUTPUT"
 
 if [[ $OUTPUT == *"command="* ]]; then
@@ -9,5 +9,5 @@ if [[ $OUTPUT == *"command="* ]]; then
     adb shell "$CMD"
 else
     echo "No command found. Please enable 'Shizuku Connectors' in Lab Features."
-    adb shell am start -n moe.shizuku.privileged.api/moe.shizuku.manager.settings.LabFeaturesActivity
+    adb shell am start -n xeonleon.xhizuku/moe.shizuku.manager.settings.LabFeaturesActivity
 fi

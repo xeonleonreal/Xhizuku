@@ -20,6 +20,7 @@ import moe.shizuku.manager.adb.AdbClient
 import moe.shizuku.manager.adb.AdbKey
 import moe.shizuku.manager.adb.AdbMdns
 import moe.shizuku.manager.adb.PreferenceAdbKeyStore
+import moe.shizuku.manager.monitor.ServerMonitorService
 import moe.shizuku.manager.starter.Starter
 import moe.shizuku.manager.utils.UserHandleCompat
 import rikka.shizuku.Shizuku
@@ -33,6 +34,8 @@ class BootCompleteReceiver : BroadcastReceiver() {
             && Intent.ACTION_BOOT_COMPLETED != intent.action) {
             return
         }
+
+        ServerMonitorService.startIfEnabled(context)
 
         if (UserHandleCompat.myUserId() > 0 || Shizuku.pingBinder()) return
 

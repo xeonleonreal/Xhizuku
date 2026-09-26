@@ -4,7 +4,9 @@ import android.content.ComponentName
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
+import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -24,18 +26,27 @@ import moe.shizuku.manager.ShizukuSettings.NIGHT_MODE
 import moe.shizuku.manager.app.AppActivity
 import moe.shizuku.manager.app.ThemeHelper
 import moe.shizuku.manager.app.ThemeHelper.KEY_BLACK_NIGHT_THEME
+import moe.shizuku.manager.app.ThemeHelper.KEY_THEME_COLOR
 import moe.shizuku.manager.app.ThemeHelper.KEY_USE_SYSTEM_COLOR
 import moe.shizuku.manager.ktx.isComponentEnabled
 import moe.shizuku.manager.ktx.setComponentEnabled
 import moe.shizuku.manager.module.ModuleSettings
+import moe.shizuku.manager.monitor.MonitorSettings
+import moe.shizuku.manager.monitor.ServerMonitorService
 import moe.shizuku.manager.receiver.BootCompleteReceiver
 import moe.shizuku.manager.ui.compose.GroupDivider
+import moe.shizuku.manager.ui.compose.MainTab
+import moe.shizuku.manager.ui.compose.MainTabBar
 import moe.shizuku.manager.ui.compose.SettingsGroup
 import moe.shizuku.manager.ui.compose.SettingsRow
 import moe.shizuku.manager.ui.compose.ShizukuExpressiveTheme
 import moe.shizuku.manager.ui.compose.ShizukuLazyScaffold
 import moe.shizuku.manager.ui.compose.SwitchSettingsRow
+import moe.shizuku.manager.ui.compose.ThemeColorDialog
+import moe.shizuku.manager.ui.compose.ThemeColorDot
+import moe.shizuku.manager.ui.compose.ThemeColorOption
 import moe.shizuku.manager.ui.compose.htmlToPlainText
+import moe.shizuku.manager.ui.compose.openMainTab
 import moe.shizuku.manager.utils.CustomTabsHelper
 import rikka.core.util.ResourceUtils
 import rikka.material.app.LocaleDelegate
@@ -46,6 +57,31 @@ import androidx.compose.runtime.rememberCoroutineScope
 import java.util.Locale
 
 class SettingsActivity : AppActivity() {
+
+    private var pendingMonitorAction: (() -> Unit)? = null
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            pendingMonitorAction?.invoke()
+        } else {
+            Toast.makeText(this, R.string.monitor_needs_permission, Toast.LENGTH_LONG).show()
+        }
+        pendingMonitorAction = null
+    }
+
+    private fun runWithNotificationPermission(action: () -> Unit) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) ==
+                android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            action()
+            return
+        }
+        pendingMonitorAction = action
+        notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +106,16 @@ class SettingsActivity : AppActivity() {
             var useSystemColor by remember {
                 mutableStateOf(ThemeHelper.isUsingSystemColor())
             }
+            var themeColor by remember {
+                mutableStateOf(ThemeColorOption.fromKey(ThemeHelper.getThemeColor()))
+            }
+            var serverNotif by remember {
+                mutableStateOf(MonitorSettings.isServerNotificationEnabled())
+            }
+            var xStatus by remember {
+                mutableStateOf(MonitorSettings.isXStatusEnabled())
+            }
+            var showThemeColorDialog by remember { mutableStateOf(false) }
             var showLanguageDialog by remember { mutableStateOf(false) }
             var showNightDialog by remember { mutableStateOf(false) }
             var showModuleModeDialog by remember { mutableStateOf(false) }
@@ -233,7 +279,10 @@ class SettingsActivity : AppActivity() {
                 ShizukuExpressiveTheme {
                     ShizukuLazyScaffold(
                         title = stringResource(R.string.settings_title),
-                        onNavigateUp = { finish() }
+                        onNavigateUp = { finish() },
+                        bottomBar = {
+                            MainTabBar(selected = MainTab.SETTINGS, onSelect = { openMainTab(it) })
+                        }
                     ) {
                         item {
                             SettingsGroup(title = stringResource(R.string.settings_startup)) {
@@ -319,6 +368,58 @@ class SettingsActivity : AppActivity() {
                                         }
                                     )
                                 }
+                                GroupDivider()
+                                SettingsRow(
+                                    icon = R.drawable.ic_settings_outline_24dp,
+                                    title = stringResource(R.string.settings_theme_color),
+                                    summary = stringResource(themeColor.labelRes),
+                                    trailing = { ThemeColorDot(option = themeColor) },
+                                    onClick = { showThemeColorDialog = true }
+                                )
+                            }
+                        }
+
+                        item {
+                            SettingsGroup(title = stringResource(R.string.settings_notifications)) {
+                                SwitchSettingsRow(
+                                    icon = R.drawable.ic_outline_notifications_active_24,
+                                    title = stringResource(R.string.monitor_server_title),
+                                    summary = stringResource(R.string.monitor_server_summary),
+                                    checked = serverNotif,
+                                    onCheckedChange = { enabled ->
+                                        if (enabled) {
+                                            runWithNotificationPermission {
+                                                MonitorSettings.setServerNotificationEnabled(true)
+                                                serverNotif = true
+                                                ServerMonitorService.refresh(this@SettingsActivity)
+                                            }
+                                        } else {
+                                            MonitorSettings.setServerNotificationEnabled(false)
+                                            serverNotif = false
+                                            ServerMonitorService.stopIfDisabled(this@SettingsActivity)
+                                        }
+                                    }
+                                )
+                                GroupDivider()
+                                SwitchSettingsRow(
+                                    icon = R.drawable.ic_outline_notifications_active_24,
+                                    title = stringResource(R.string.monitor_xstatus_title),
+                                    summary = stringResource(R.string.monitor_xstatus_summary),
+                                    checked = xStatus,
+                                    onCheckedChange = { enabled ->
+                                        if (enabled) {
+                                            runWithNotificationPermission {
+                                                MonitorSettings.setXStatusEnabled(true)
+                                                xStatus = true
+                                                ServerMonitorService.refresh(this@SettingsActivity)
+                                            }
+                                        } else {
+                                            MonitorSettings.setXStatusEnabled(false)
+                                            xStatus = false
+                                            ServerMonitorService.stopIfDisabled(this@SettingsActivity)
+                                        }
+                                    }
+                                )
                             }
                         }
 
@@ -607,6 +708,21 @@ class SettingsActivity : AppActivity() {
                             }
                         )
                     }
+                }
+            }
+
+            if (showThemeColorDialog) {
+                ShizukuExpressiveTheme {
+                    ThemeColorDialog(
+                        current = themeColor,
+                        onDismiss = { showThemeColorDialog = false },
+                        onSelect = { option ->
+                            prefs.edit().putString(KEY_THEME_COLOR, option.key).apply()
+                            themeColor = option
+                            showThemeColorDialog = false
+                            recreateTick++
+                        }
+                    )
                 }
             }
             }

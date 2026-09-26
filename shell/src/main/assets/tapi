@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# TAPI - Termux API bridge for Nightzuku
+# TAPI - Termux API bridge for Xhizuku
 # All commands use absolute /system/bin/ paths to avoid PATH issues on Android 13+.
 
 ANDROID_BIN=/system/bin
@@ -27,12 +27,12 @@ if [ ! -f "$DEX" ]; then
 fi
 
 if [ ! -f "$DEX" ]; then
-  apk_path=$("$PM" path kerneldroid.nightzuku 2>/dev/null)
+  apk_path=$("$PM" path xeonleon.xhizuku 2>/dev/null)
   case "$apk_path" in
     package:*) apk_path="${apk_path#package:}" ;;
   esac
   if [ -z "$apk_path" ]; then
-    apk_path=$("$PM" path kerneldroid.nightzuku 2>&1)
+    apk_path=$("$PM" path xeonleon.xhizuku 2>&1)
     case "$apk_path" in
       package:*) apk_path="${apk_path#package:}" ;;
     esac
@@ -50,7 +50,7 @@ fi
 
 if [ ! -f "$DEX" ]; then
   echo "tapi: Cannot find rish_shizuku.dex" >&2
-  echo "Make sure Nightzuku is installed." >&2
+  echo "Make sure Xhizuku is installed." >&2
   echo "tapi: PM=$PM APK=$apk_path" >&2
   exit 1
 fi
@@ -69,7 +69,7 @@ case "$FIRST_ARG" in
   --help|-h)
     exec "$APP_PROCESS" -Djava.class.path="$DEX" /system/bin --nice-name=tapi-manager rikka.shizuku.shell.TapiManager "$@"
     ;;
-  nightzuku|status|start|stop|grant|revoke|modules|--modules)
+  xhizuku|nightzuku|status|start|stop|grant|revoke|modules|--modules)
     exec "$APP_PROCESS" -Djava.class.path="$DEX" /system/bin --nice-name=tapi-manager rikka.shizuku.shell.TapiManager "$@"
     ;;
   *)

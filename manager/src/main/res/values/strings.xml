@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Nightzuku</string>
+    <string name="app_name" translatable="false">Xhizuku</string>
 
     <!-- To translators: you can leave your here -->
     <string name="translation_contributors" />
@@ -12,9 +12,9 @@
 
     <!-- Home - Adb -->
     <string name="home_adb_title"><![CDATA[Start by connecting to a computer]]></string>
-    <string name="home_adb_description"><![CDATA[For devices without root, you need to use adb to start Nightzuku (requires computer connection). This process needs to be repeated every time the device is restarted. Please <b><a href=\"%1$s\">read the help</a></b>.]]>
+    <string name="home_adb_description"><![CDATA[For devices without root, you need to use adb to start Xhizuku (requires computer connection). This process needs to be repeated every time the device is restarted. Please <b><a href=\"%1$s\">read the help</a></b>.]]>
 
-Note: Nightzuku is the modern successor to Shizuku. Please make sure to uninstall the old official Shizuku app first to prevent conflicts.</string>
+Note: Xhizuku is the modern successor to Shizuku. Please make sure to uninstall the old official Shizuku app first to prevent conflicts.</string>
     <string name="home_adb_button_view_help">Read help</string>
     <string name="home_adb_button_view_command">View command</string>
     <string name="home_adb_dialog_view_command_message"><![CDATA[<font face="monospace">%1$s</font><br><br>* There are some other considerations, please confirm that you have read the help first.]]></string>
@@ -23,9 +23,9 @@ Note: Nightzuku is the modern successor to Shizuku. Please make sure to uninstal
 
     <!-- Home - Wireless Adb -->
     <string name="home_wireless_adb_title"><![CDATA[Start via Wireless debugging]]></string>
-    <string name="home_wireless_adb_description"><![CDATA[On Android 11 or above, you can enable Wireless debugging and start Nightzuku directly from your device, without connecting to a computer.<p>Please view the step-by-step guide first.]]>
+    <string name="home_wireless_adb_description"><![CDATA[On Android 11 or above, you can enable Wireless debugging and start Xhizuku directly from your device, without connecting to a computer.<p>Please view the step-by-step guide first.]]>
 
-Note: Nightzuku is the modern successor to Shizuku. Please make sure to uninstall the old official Shizuku app first to prevent conflicts.</string>
+Note: Xhizuku is the modern successor to Shizuku. Please make sure to uninstall the old official Shizuku app first to prevent conflicts.</string>
     <string name="home_wireless_adb_description_pre_11"><![CDATA[Before Android 11, connecting to a computer is required to enable Wireless debugging.]]></string>
     <string name="home_wireless_adb_view_guide_button">Step-by-step guide</string>
     <string name="home_local_network_title">Local network access</string>
@@ -37,7 +37,7 @@ Note: Nightzuku is the modern successor to Shizuku. Please make sure to uninstal
 
     <!-- Adb -->
     <string name="dialog_adb_discovery">Searching for wireless debugging service</string>
-    <string name="dialog_adb_discovery_message">Please enable \"Wireless debugging\" in \"Developer options\". \"Wireless debugging\" is automatically disabled when network changes.\n\nNote, do not disable \"Developer options\" or \"USB debugging\", or Nightzuku will be stopped.</string>
+    <string name="dialog_adb_discovery_message">Please enable \"Wireless debugging\" in \"Developer options\". \"Wireless debugging\" is automatically disabled when network changes.\n\nNote, do not disable \"Developer options\" or \"USB debugging\", or Xhizuku will be stopped.</string>
     <string name="dialog_adb_discovery_message_toggle_wireless_debugging">Please try to disable and enable \"Wireless debugging\" if it keeps searching.</string>
     <string name="dialog_adb_port">Port</string>
     <string name="dialog_adb_invalid_port">Port is an integer ranging from 1 to 65535.</string>
@@ -55,24 +55,24 @@ Note: Nightzuku is the modern successor to Shizuku. Please make sure to uninstal
     <string name="adb_pair_required">Please go through the pairing step first.</string>
     <string name="development_settings">Developer options</string>
     <string name="notification_settings">Notification options</string>
-    <string name="adb_pairing_tutorial_title">Pair Nightzuku with your device</string>
-    <string name="adb_pairing_tutorial_content_notification">A notification from Nightzuku will help you complete the pairing.</string>
+    <string name="adb_pairing_tutorial_title">Pair Xhizuku with your device</string>
+    <string name="adb_pairing_tutorial_content_notification">A notification from Xhizuku will help you complete the pairing.</string>
     <string name="adb_pairing_tutorial_content_steps">Enter \"Developer options\" - \"Wireless debugging\". Tap \"Pair device with pairing code\", you will see a six-digit code.</string>
     <string name="adb_pairing_tutorial_content_enter_pairing_code">Enter the code in the notification to complete pairing.</string>
-    <string name="adb_pairing_tutorial_content_notification_blocked">The pairing process needs you to interact with a notification from Nightzuku. Please allow Nightzuku to post notifications.</string>
+    <string name="adb_pairing_tutorial_content_notification_blocked">The pairing process needs you to interact with a notification from Xhizuku. Please allow Xhizuku to post notifications.</string>
     <string name="adb_pairing_tutorial_content_miui">MIUI users may need to switch notification style to \"Android\" from \"Notification\" - \"Notification shade\" in system settings.</string>
     <string name="adb_pairing_tutorial_content_miui_2">Otherwise, you may not able to enter paring code from the notification.</string>
     <string name="adb_pairing_tutorial_content_left_is_clickable">Please note, left part of the \"Wireless debugging\" option is clickable, tapping it will open a new page. Only turing on the switch on the right is incorrect.</string>
-    <string name="adb_pairing_tutorial_content_finish">Back to Nightzuku and start Nightzuku.</string>
-    <string name="adb_pairing_tutorial_content_network">Nightzuku needs to access local network. It is controlled by the network permission.</string>
-    <string name="adb_pairing_tutorial_content_network_limation_not_foreground">Some systems (such as MIUI) disallow apps to access the network when they are not visible, even if the app uses foreground service as standard. Please disable battery optimization features for Nightzuku on such systems.</string>
+    <string name="adb_pairing_tutorial_content_finish">Back to Xhizuku and start Xhizuku.</string>
+    <string name="adb_pairing_tutorial_content_network">Xhizuku needs to access local network. It is controlled by the network permission.</string>
+    <string name="adb_pairing_tutorial_content_network_limation_not_foreground">Some systems (such as MIUI) disallow apps to access the network when they are not visible, even if the app uses foreground service as standard. Please disable battery optimization features for Xhizuku on such systems.</string>
 
     <!-- Home - Root -->
     <string name="home_root_title"><![CDATA[Start (for rooted devices)]]></string>
-    <string name="home_root_description"><![CDATA[In addition, Nightzuku can be started automatically on boot. If not, please check if your system or third-party tools have restricted Nightzuku.<br>You can refer to %s.]]>
+    <string name="home_root_description"><![CDATA[In addition, Xhizuku can be started automatically on boot. If not, please check if your system or third-party tools have restricted Xhizuku.<br>You can refer to %s.]]>
 
-Note: Nightzuku is the modern successor to Shizuku. Please make sure to uninstall the old official Shizuku app first to prevent conflicts.</string>
-    <string name="home_root_description_sui"><![CDATA[If you are using Magisk, you can try %1$s. For root users, it will eventually replace Nightzuku. Note, existing applications needs to change a little to use %2$s.]]></string>
+Note: Xhizuku is the modern successor to Shizuku. Please make sure to uninstall the old official Shizuku app first to prevent conflicts.</string>
+    <string name="home_root_description_sui"><![CDATA[If you are using Magisk, you can try %1$s. For root users, it will eventually replace Xhizuku. Note, existing applications needs to change a little to use %2$s.]]></string>
     <string name="home_root_button_start">Start</string>
     <string name="home_root_button_restart">Restart</string>
 
@@ -83,11 +83,11 @@ Note: Nightzuku is the modern successor to Shizuku. Please make sure to uninstal
         <item quantity="other"><![CDATA[Authorized %d applications]]></item>
     </plurals>
     <string name="home_app_management_view_authorized_apps"><![CDATA[Tap to manage authorized apps]]></string>
-    <string name="home_app_management_empty">Apps that has requested or declared Nightzuku will show here.</string>
+    <string name="home_app_management_empty">Apps that has requested or declared Xhizuku will show here.</string>
 
     <!-- Home - Learn more -->
-    <string name="home_learn_more_title">Learn Nightzuku</string>
-    <string name="home_learn_more_description">Learn how to develop with Nightzuku</string>
+    <string name="home_learn_more_title">Learn Xhizuku</string>
+    <string name="home_learn_more_description">Learn how to develop with Xhizuku</string>
 
     <!-- Home - Diagnostics -->
     <string name="home_refresh">Refresh</string>
@@ -98,27 +98,27 @@ Note: Nightzuku is the modern successor to Shizuku. Please make sure to uninstal
 
     <!-- Home - Adb permissions limited -->
     <string name="home_adb_is_limited_title">You need to take an extra step</string>
-    <string name="home_adb_is_limited_description">Your device manufacturer has restricted adb permissions and apps using Nightzuku will not work properly.\n\nUsually, this limitation can be lifted by adjusting some options in \"Developer options\". Please read the help for details on how to do this.\n\nYou may need to restart Nightzuku for the operation to take effect.</string>
+    <string name="home_adb_is_limited_description">Your device manufacturer has restricted adb permissions and apps using Xhizuku will not work properly.\n\nUsually, this limitation can be lifted by adjusting some options in \"Developer options\". Please read the help for details on how to do this.\n\nYou may need to restart Xhizuku for the operation to take effect.</string>
 
     <!-- Application management -->
     <string name="app_management_select_all">Select all</string>
     <string name="app_management_deselect_all">Deselect all</string>
     <string name="app_management_dialog_adb_is_limited_title">The permission of adb is limited</string>
     <string name="app_management_dialog_adb_is_limited_message"><![CDATA[It\'s highly possible that your device manufacturer limits the permission of adb.<p>There may be a solution for your system in <b><a href=\"%1$s\">this document</a></b>.]]></string>
-    <string name="app_management_item_summary_requires_root">* requires Nightzuku runs with root</string>
+    <string name="app_management_item_summary_requires_root">* requires Xhizuku runs with root</string>
 
     <!-- Terminal -->
-    <string name="home_terminal_title">Use Nightzuku in terminal apps</string>
-    <string name="home_terminal_description">Run commands through Nightzuku in terminal apps you like</string>
+    <string name="home_terminal_title">Use Xhizuku in terminal apps</string>
+    <string name="home_terminal_description">Run commands through Xhizuku in terminal apps you like</string>
     <string name="terminal_tutorial_1">First, Export files to any where you want. You will find two files, %1$s and %2$s.</string>
-    <string name="terminal_tutorial_1_description">If there are files with the same name in the selected folder, they will be deleted.\n\nThe export function uses SAF (Storage Access Framework). It\'s reported that MIUI breaks the functions of SAF. If you are using MIUI, you may have to extract the file from Nightzuku\'s apk or download from GitHub.</string>
+    <string name="terminal_tutorial_1_description">If there are files with the same name in the selected folder, they will be deleted.\n\nThe export function uses SAF (Storage Access Framework). It\'s reported that MIUI breaks the functions of SAF. If you are using MIUI, you may have to extract the file from Xhizuku\'s apk or download from GitHub.</string>
     <string name="terminal_export_files">Export files</string>
     <string name="terminal_tutorial_2">Then, use any text editor to open and edit %1$s.</string>
-    <string name="terminal_tutorial_2_description">For example, if you want to use Nightzuku in %1$s, you should replace %2$s with %3$s (%4$s is the package name of %1$s).</string>
-    <string name="terminal_tutorial_3">Finally, move the files to somewhere where your terminal app can access, you will be able to use %1$s to run commands through Nightzuku.</string>
+    <string name="terminal_tutorial_2_description">For example, if you want to use Xhizuku in %1$s, you should replace %2$s with %3$s (%4$s is the package name of %1$s).</string>
+    <string name="terminal_tutorial_3">Finally, move the files to somewhere where your terminal app can access, you will be able to use %1$s to run commands through Xhizuku.</string>
     <string name="terminal_tutorial_3_description">Some tips: grant execute permission to %1$s and add it to %2$s, you will able to use %1$s directly.</string>
     <string name="rish_description"><![CDATA[
-With %1$s, in any terminal app, you can connect to and interact with the shell runs by Nightzuku.
+With %1$s, in any terminal app, you can connect to and interact with the shell runs by Xhizuku.
 <p>About the detailed usage %1$s, tap to view the document.
     ]]></string>
 
@@ -133,13 +133,13 @@ With %1$s, in any terminal app, you can connect to and interact with the shell r
     <string name="settings_translation">Participate in translation</string>
     <string name="settings_translation_summary">Help us translate %s into your language</string>
     <string name="settings_start_on_boot">Start on boot (root)</string>
-    <string name="settings_start_on_boot_summary">For rooted devices, Nightzuku is able to start automatically on boot</string>
+    <string name="settings_start_on_boot_summary">For rooted devices, Xhizuku is able to start automatically on boot</string>
     <string name="settings_use_system_color">Use system theme color</string>
 
     <!-- ADB modules -->
     <string name="modules_title">ADB Modules</string>
     <string name="modules_settings_title">Modules</string>
-    <string name="modules_settings_summary">Install ZIP modules and run their actions through the active Nightzuku ADB/root server</string>
+    <string name="modules_settings_summary">Install ZIP modules and run their actions through the active Xhizuku ADB/root server</string>
     <string name="modules_header_summary">%1$d installed, %2$d enabled</string>
     <string name="modules_version_label">Version: %s</string>
     <string name="modules_author_label">Author: %s</string>
@@ -157,7 +157,7 @@ With %1$s, in any terminal app, you can connect to and interact with the shell r
     <string name="modules_permission_service">Run Service</string>
     <string name="modules_permission_service_summary">Allow service.sh when background actions are also enabled.</string>
     <string name="modules_permission_web_bridge">WebUI shell bridge</string>
-    <string name="modules_permission_web_bridge_summary">Expose window.Nightzuku only for local WebUI and only when WebView internet is off.</string>
+    <string name="modules_permission_web_bridge_summary">Expose window.Xhizuku only for local WebUI and only when WebView internet is off.</string>
     <string name="modules_permission_web_network">WebView internet</string>
     <string name="modules_permission_web_network_summary">Allow HTTPS navigation/assets. This disables shell bridge exposure for that WebView.</string>
     <string name="modules_permission_web_download">WebUI download()</string>
@@ -185,7 +185,7 @@ With %1$s, in any terminal app, you can connect to and interact with the shell r
     <string name="modules_webui">Module WebUI</string>
     <string name="modules_delete">Delete</string>
     <string name="modules_delete_title">Delete module?</string>
-    <string name="modules_delete_message">%s will be removed from Nightzuku module storage.</string>
+    <string name="modules_delete_message">%s will be removed from Xhizuku module storage.</string>
     <string name="modules_action_result">Action finished: exit %d</string>
     <string name="modules_action_failed">Action failed</string>
     <string name="modules_service_result">Service finished: exit %d</string>
@@ -209,13 +209,13 @@ With %1$s, in any terminal app, you can connect to and interact with the shell r
     <string name="about_view_source_code"><![CDATA[View source code at %s]]></string>
 
     <!-- Stop -->
-    <string name="action_stop">Stop Nightzuku</string>
-    <string name="dialog_stop_message">Nightzuku service will be stopped.</string>
+    <string name="action_stop">Stop Xhizuku</string>
+    <string name="dialog_stop_message">Xhizuku service will be stopped.</string>
 
     <!-- Notification -->
     <string name="notification_channel_service_status">Service start status</string>
-    <string name="notification_service_starting">Nightzuku service is starting…</string>
-    <string name="notification_service_start_failed">Start Nightzuku service failed.</string>
+    <string name="notification_service_starting">Xhizuku service is starting…</string>
+    <string name="notification_service_start_failed">Start Xhizuku service failed.</string>
     <string name="notification_service_start_no_root">Failed to request root permission.</string>
     <string name="notification_working">Working…</string>
     <string name="notification_channel_adb_pairing">Wireless debugging pairing</string>
@@ -225,15 +225,15 @@ With %1$s, in any terminal app, you can connect to and interact with the shell r
     <string name="notification_adb_pairing_stop_searching">Stop searching</string>
     <string name="notification_adb_pairing_working_title">Pairing in progress</string>
     <string name="notification_adb_pairing_succeed_title">Pairing successful</string>
-    <string name="notification_adb_pairing_succeed_text">You can start Nightzuku service now.</string>
+    <string name="notification_adb_pairing_succeed_text">You can start Xhizuku service now.</string>
     <string name="notification_adb_pairing_failed_title">Pairing failed</string>
     <string name="notification_adb_pairing_retry">Retry</string>
 
     <!-- Permission related, appears in system permission UI -->
-    <string name="permission_group_label" translatable="false">Nightzuku</string>
+    <string name="permission_group_label" translatable="false">Xhizuku</string>
     <string name="permission_group_description" translatable="false">@string/permission_label</string>
-    <string name="permission_label">access Nightzuku</string>
-    <string name="permission_description">Allow the app to use Nightzuku.</string>
+    <string name="permission_label">access Xhizuku</string>
+    <string name="permission_description">Allow the app to use Xhizuku.</string>
     <string name="permission_warning_template"><![CDATA[Allow <b>%1$s</b> to %2$s?]]></string>
     <string name="grant_dialog_button_allow_always">Allow all the time</string>
     <string name="grant_dialog_button_deny">"Deny"</string>
@@ -249,17 +249,17 @@ With %1$s, in any terminal app, you can connect to and interact with the shell r
     <string name="toast_copied_to_clipboard_with_text"><![CDATA[<b>%s</b> has been copied to clipboard.]]></string>
 
     <!-- Messages for legacy -->
-    <string name="dialog_legacy_not_support_title">%1$s does not support modern Nightzuku</string>
-    <string name="dialog_legacy_not_support_message"><![CDATA[Legacy Nightzuku has been deprecated since March 2019. Also, legacy Nightzuku does not work on newer Android systems.<p>Please ask the developer of <b>%1$s</b> to update.]]></string>
-    <string name="dialog_requesting_legacy_title">%1$s is requesting legacy Nightzuku</string>
-    <string name="dialog_requesting_legacy_message"><![CDATA[<b>%1$s</b> has modern Nightzuku support, but it\'s requesting legacy Nightzuku. This could because Nightzuku is not running, please check in Nightzuku app.<p>Legacy Nightzuku has been deprecated since March 2019.]]></string>
-    <string name="dialog_requesting_legacy_button_open_shizuku">Open Nightzuku</string>
+    <string name="dialog_legacy_not_support_title">%1$s does not support modern Xhizuku</string>
+    <string name="dialog_legacy_not_support_message"><![CDATA[Legacy Xhizuku has been deprecated since March 2019. Also, legacy Xhizuku does not work on newer Android systems.<p>Please ask the developer of <b>%1$s</b> to update.]]></string>
+    <string name="dialog_requesting_legacy_title">%1$s is requesting legacy Xhizuku</string>
+    <string name="dialog_requesting_legacy_message"><![CDATA[<b>%1$s</b> has modern Xhizuku support, but it\'s requesting legacy Xhizuku. This could because Xhizuku is not running, please check in Xhizuku app.<p>Legacy Xhizuku has been deprecated since March 2019.]]></string>
+    <string name="dialog_requesting_legacy_button_open_shizuku">Open Xhizuku</string>
 
     <!-- Lab Features -->
     <string name="lab_features_title">Lab Features</string>
     <string name="lab_features_summary">Experimental features</string>
-    <string name="shizuku_connectors_title">Nightzuku Connectors</string>
-    <string name="shizuku_connectors_summary">Allow plugins to activate Nightzuku</string>
+    <string name="shizuku_connectors_title">Xhizuku Connectors</string>
+    <string name="shizuku_connectors_summary">Allow plugins to activate Xhizuku</string>
     <string name="tapi_title">TAPI</string>
     <string name="tapi_summary">Enable Termux API and command-line execution bridge</string>
     <string name="tapi_warning_title">Enable TAPI?</string>
@@ -333,4 +333,73 @@ With %1$s, in any terminal app, you can connect to and interact with the shell r
     <string name="wear_catalog_sort_official">Official</string>
     <string name="wear_catalog_sort_by">Sort by</string>
     <string name="wear_catalog_filter">Filter</string>
+
+    <!-- Main tabs -->
+    <string name="tab_status">Status</string>
+    <string name="tab_extras">Extras</string>
+    <string name="tab_settings">Settings</string>
+    <string name="extras_title">Extras</string>
+    <string name="extras_shizutest_title">ShizuTest</string>
+    <string name="extras_shizutest_summary">Run integration checks against Xhizuku</string>
+
+    <!-- Theme color -->
+    <string name="settings_theme_color">Theme color</string>
+    <string name="settings_theme_color_summary">Pick an accent color for the app</string>
+    <string name="theme_color_system">System default</string>
+    <string name="theme_color_red">Red</string>
+    <string name="theme_color_blue">Blue</string>
+    <string name="theme_color_green">Green</string>
+    <string name="theme_color_purple">Purple</string>
+    <string name="theme_color_orange">Orange</string>
+
+    <!-- Monitor & notifications -->
+    <string name="settings_notifications">Notifications</string>
+    <string name="monitor_server_title">Server status notification</string>
+    <string name="monitor_server_summary">Show an ongoing notification and alert me when Xhizuku stops</string>
+    <string name="monitor_xstatus_title">XStatus monitor</string>
+    <string name="monitor_xstatus_summary">Ongoing notification with CPU, GPU, RAM and swap usage</string>
+    <string name="notification_channel_server_status">Server status</string>
+    <string name="notification_channel_xstatus">XStatus monitor</string>
+    <string name="monitor_running_title">Xhizuku is running</string>
+    <string name="monitor_running_text">Version %1$s via %2$s</string>
+    <string name="monitor_running_mode_root">root</string>
+    <string name="monitor_running_mode_adb">ADB</string>
+    <string name="monitor_stopped_title">Xhizuku is stopped</string>
+    <string name="monitor_stopped_text">Tap to open Xhizuku and start the server</string>
+    <string name="monitor_died_title">Xhizuku server died</string>
+    <string name="monitor_died_text">The Xhizuku server process is no longer running</string>
+    <string name="monitor_stop_server">Stop server</string>
+    <string name="monitor_needs_permission">Please allow notifications to enable this feature</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title">Welcome to Xhizuku</string>
+    <string name="onboarding_welcome">Xhizuku lets apps use system APIs directly with elevated permissions. This short setup will get the server running.</string>
+    <string name="onboarding_step_migrate">Check old apps</string>
+    <string name="onboarding_migrate_title">Uninstall conflicting apps</string>
+    <string name="onboarding_migrate_body">Other Shizuku variants conflict with Xhizuku. Please uninstall them before continuing.</string>
+    <string name="onboarding_migrate_found">Found conflicting app: %1$s. Tap to open its app info and uninstall it.</string>
+    <string name="onboarding_migrate_clear">No conflicting apps found. You are good to go.</string>
+    <string name="onboarding_migrate_open">Open app info</string>
+    <string name="onboarding_step_start">Start server</string>
+    <string name="onboarding_start_title">Start the Xhizuku server</string>
+    <string name="onboarding_start_root">Rooted device</string>
+    <string name="onboarding_start_root_summary">One-tap start, auto-start on boot available</string>
+    <string name="onboarding_start_root_go">Start with root</string>
+    <string name="onboarding_start_wireless">Wireless debugging</string>
+    <string name="onboarding_start_wireless_summary">Android 11+, no computer needed</string>
+    <string name="onboarding_start_wireless_go">Open pairing guide</string>
+    <string name="onboarding_start_adb">Computer (ADB)</string>
+    <string name="onboarding_start_adb_summary">Run this command, then return here</string>
+    <string name="onboarding_copy_command">Copy command</string>
+    <string name="onboarding_step_notifications">Notifications</string>
+    <string name="onboarding_notifications_title">Stay informed</string>
+    <string name="onboarding_notifications_body">Xhizuku can show a status notification and alert you if the server dies. This needs notification permission.</string>
+    <string name="onboarding_allow_notifications">Allow notifications</string>
+    <string name="onboarding_step_done">Done</string>
+    <string name="onboarding_done_title">All set</string>
+    <string name="onboarding_done_body">Finish setup and open Xhizuku. You can change everything later in Settings.</string>
+    <string name="onboarding_back">Back</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_finish">Open Xhizuku</string>
 </resources>

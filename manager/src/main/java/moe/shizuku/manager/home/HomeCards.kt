@@ -31,6 +31,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -48,10 +50,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.text.HtmlCompat
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
 import moe.shizuku.manager.BuildConfig
 import moe.shizuku.manager.Helps
 import moe.shizuku.manager.R
 import moe.shizuku.manager.model.ServiceStatus
+import moe.shizuku.manager.ui.compose.MainTab
+import moe.shizuku.manager.ui.compose.MainTabBar
 import moe.shizuku.manager.ui.compose.ShizukuIcon
 import moe.shizuku.manager.utils.EnvironmentUtils
 import rikka.lifecycle.Resource
@@ -98,7 +105,8 @@ internal fun HomeScreen(
     onOpenAdbPermissionHelp: () -> Unit,
     onLearnMore: () -> Unit,
     onCopyDiagnostics: (String) -> Unit,
-    onRequestLocalNetworkPermission: () -> Unit
+    onRequestLocalNetworkPermission: () -> Unit,
+    onOpenTab: (MainTab) -> Unit = {}
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val isWatch = androidx.compose.runtime.remember(context) { moe.shizuku.manager.utils.EnvironmentUtils.isWatch(context) }
@@ -180,7 +188,8 @@ internal fun HomeScreen(
             onOpenAdbPermissionHelp = onOpenAdbPermissionHelp,
             onLearnMore = onLearnMore,
             onCopyDiagnostics = onCopyDiagnostics,
-            onRequestLocalNetworkPermission = onRequestLocalNetworkPermission
+            onRequestLocalNetworkPermission = onRequestLocalNetworkPermission,
+            onOpenTab = onOpenTab
         )
     }
 }
@@ -207,7 +216,8 @@ internal fun HomeScreen(
     onOpenAdbPermissionHelp: () -> Unit,
     onLearnMore: () -> Unit,
     onCopyDiagnostics: (String) -> Unit,
-    onRequestLocalNetworkPermission: () -> Unit
+    onRequestLocalNetworkPermission: () -> Unit,
+    onOpenTab: (MainTab) -> Unit
 ) {
     val context = LocalContext.current
     val status = serviceResource?.data ?: ServiceStatus()
@@ -232,12 +242,6 @@ internal fun HomeScreen(
                     )
                 },
                 actions = {
-                    androidx.compose.material3.IconButton(onClick = onSettings) {
-                        ShizukuIcon(
-                            icon = R.drawable.ic_action_settings_24dp,
-                            contentDescription = stringResource(R.string.settings_title)
-                        )
-                    }
                     androidx.compose.material3.IconButton(onClick = onRefresh) {
                         ShizukuIcon(
                             icon = R.drawable.ic_server_restart,
@@ -283,6 +287,9 @@ internal fun HomeScreen(
                     scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer
                 )
             )
+        },
+        bottomBar = {
+            MainTabBar(selected = MainTab.STATUS, onSelect = onOpenTab)
         }
     ) { innerPadding ->
         androidx.compose.foundation.lazy.LazyColumn(
@@ -306,32 +313,6 @@ internal fun HomeScreen(
                         status = status,
                         grantedCount = grantedCount,
                         onClick = onManageApps
-                    )
-                }
-                item {
-                    SimpleActionCard(
-                        icon = R.drawable.ic_adb_24dp,
-                        title = stringResource(R.string.modules_title),
-                        body = if (running) {
-                            stringResource(R.string.home_modules_description)
-                        } else {
-                            stringResource(R.string.home_status_service_not_running, stringResource(R.string.app_name))
-                        },
-                        enabled = running,
-                        onClick = onModules
-                    )
-                }
-                item {
-                    SimpleActionCard(
-                        icon = R.drawable.ic_terminal_24,
-                        title = stringResource(R.string.home_terminal_title),
-                        body = if (running) {
-                            stringResource(R.string.home_terminal_description)
-                        } else {
-                            stringResource(R.string.home_status_service_not_running, stringResource(R.string.app_name))
-                        },
-                        enabled = running,
-                        onClick = onTerminal
                     )
                 }
             }
@@ -489,7 +470,8 @@ internal fun RootCard(
         body = htmlStringResource(
             R.string.home_root_description,
             "Don't kill my app!"
-        )
+        ),
+        expandableBody = true
     ) {
         HomeButtons(
             listOf(
@@ -532,7 +514,8 @@ internal fun WirelessAdbCard(
     HomeCard(
         icon = R.drawable.ic_wadb_24,
         title = htmlStringResource(R.string.home_wireless_adb_title),
-        body = listOfNotNull(body, permissionLine).joinToString("\n\n")
+        body = listOfNotNull(body, permissionLine).joinToString("\n\n"),
+        expandableBody = true
     ) {
         val buttons = mutableListOf(
             HomeButtonSpec(
@@ -566,7 +549,8 @@ internal fun AdbCommandCard(
     HomeCard(
         icon = R.drawable.ic_adb_24dp,
         title = htmlStringResource(R.string.home_adb_title),
-        body = htmlStringResource(R.string.home_adb_description, Helps.ADB.get())
+        body = htmlStringResource(R.string.home_adb_description, Helps.ADB.get()),
+        expandableBody = true
     ) {
         HomeButtons(
             listOf(
@@ -597,7 +581,8 @@ internal fun LocalNetworkPermissionCard(
         body = stringResource(
             R.string.home_local_network_description,
             localNetworkPermissionState.label
-        )
+        ),
+        expandableBody = true
     ) {
         HomeButtons(
             listOf(
@@ -620,7 +605,8 @@ internal fun DiagnosticsCard(
     HomeCard(
         icon = R.drawable.ic_outline_info_24,
         title = stringResource(R.string.home_diagnostics_title),
-        body = diagnostics
+        body = diagnostics,
+        expandableBody = true
     ) {
         HomeButtons(
             listOf(
@@ -659,6 +645,7 @@ internal fun HomeCard(
     body: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    expandableBody: Boolean = false,
     onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit = {}
 ) {
@@ -667,6 +654,8 @@ internal fun HomeCard(
     } else {
         Modifier
     }
+    var expanded by remember { mutableStateOf(false) }
+    val showBody = body.isNotBlank() && (!expandableBody || expanded)
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -704,7 +693,7 @@ internal fun HomeCard(
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                if (body.isNotBlank()) {
+                if (showBody) {
                     Text(
                         text = body,
                         style = MaterialTheme.typography.bodyMedium,
@@ -712,6 +701,15 @@ internal fun HomeCard(
                     )
                 }
                 content()
+            }
+            if (expandableBody && body.isNotBlank()) {
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
     }

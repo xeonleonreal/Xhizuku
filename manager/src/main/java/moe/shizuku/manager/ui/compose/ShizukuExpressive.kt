@@ -129,8 +129,7 @@ fun ShizukuExpressiveTheme(content: @Composable () -> Unit) {
             dynamicDarkColorScheme(context)
         ThemeHelper.isUsingSystemColor() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
             dynamicLightColorScheme(context)
-        dark -> darkColorScheme()
-        else -> lightColorScheme()
+        else -> appColorScheme(dark)
     }
     val colorScheme = if (dark && ThemeHelper.isBlackNightTheme(context)) {
         baseScheme.copy(
@@ -205,8 +204,7 @@ fun TvShizukuTheme(content: @Composable () -> Unit) {
     val baseScheme = when {
         useDynamic && dark -> dynamicDarkColorScheme(context)
         useDynamic -> dynamicLightColorScheme(context)
-        dark -> darkColorScheme()
-        else -> lightColorScheme()
+        else -> appColorScheme(dark)
     }
 
     var colorScheme = TvColorScheme(
@@ -351,6 +349,7 @@ fun ShizukuScaffold(
     onNavigateUp: (() -> Unit)? = null,
     navigationIcon: Int = R.drawable.ic_arrow_back_24,
     actions: @Composable RowScope.() -> Unit = {},
+    bottomBar: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -379,6 +378,7 @@ fun ShizukuScaffold(
                 )
             )
         },
+        bottomBar = bottomBar,
         content = content
     )
 }
@@ -390,6 +390,7 @@ fun ShizukuLazyScaffold(
     onNavigateUp: (() -> Unit)? = null,
     navigationIcon: Int = R.drawable.ic_arrow_back_24,
     actions: @Composable RowScope.() -> Unit = {},
+    bottomBar: @Composable () -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(10.dp),
     content: LazyListScope.() -> Unit
@@ -399,7 +400,8 @@ fun ShizukuLazyScaffold(
         modifier = modifier,
         onNavigateUp = onNavigateUp,
         navigationIcon = navigationIcon,
-        actions = actions
+        actions = actions,
+        bottomBar = bottomBar
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier

@@ -30,11 +30,14 @@ import moe.shizuku.manager.management.ApplicationManagementActivity
 import moe.shizuku.manager.management.appsViewModel
 import moe.shizuku.manager.module.AdbModuleManager
 import moe.shizuku.manager.module.ModulesActivity
+import moe.shizuku.manager.monitor.ServerMonitorService
+import moe.shizuku.manager.onboarding.OnboardingActivity
 import moe.shizuku.manager.settings.SettingsActivity
 import moe.shizuku.manager.shell.ShellTutorialActivity
 import moe.shizuku.manager.starter.Starter
 import moe.shizuku.manager.starter.StarterActivity
 import moe.shizuku.manager.ui.compose.ShizukuExpressiveTheme
+import moe.shizuku.manager.ui.compose.openMainTab
 import moe.shizuku.manager.utils.CustomTabsHelper
 import moe.shizuku.manager.utils.EnvironmentUtils
 import moe.shizuku.manager.utils.UserHandleCompat
@@ -76,6 +79,10 @@ abstract class HomeActivity : AppActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (OnboardingActivity.shouldShow(this)) {
+            startActivity(Intent(this, OnboardingActivity::class.java))
+        }
 
         setContent {
             val serviceResource by homeModel.serviceStatus.observeAsState()
@@ -148,7 +155,8 @@ abstract class HomeActivity : AppActivity() {
                         onCopyDiagnostics = { copyDiagnostics(it) },
                         onRequestLocalNetworkPermission = {
                             requestLocalNetworkPermission { permissionRefreshTick.intValue++ }
-                        }
+                        },
+                        onOpenTab = { openMainTab(it) }
                     )
 
                     if (showAboutDialog) {
@@ -240,6 +248,7 @@ abstract class HomeActivity : AppActivity() {
         super.onResume()
         checkServerStatus()
         permissionRefreshTick.intValue++
+        ServerMonitorService.startIfEnabled(this)
     }
 
     private fun checkServerStatus() {

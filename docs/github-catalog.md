@@ -1,6 +1,6 @@
 # GitHub Catalog
 
-Online module discovery system for Nightzuku ADB modules.
+Online module discovery system for Xhizuku ADB modules.
 
 ## How It Works
 
@@ -16,7 +16,7 @@ Modules are discovered via GitHub Topics search (`topic:adb-modules`). Module au
 ## Module Limits
 
 - Max 4 modules per user (across all their repos)
-- Official owner (`kerneldroid`) is exempt from limits
+- Official owner (`xeonleon`) is exempt from limits
 - Repos from users exceeding the limit are skipped during discovery
 
 ## Install Modes

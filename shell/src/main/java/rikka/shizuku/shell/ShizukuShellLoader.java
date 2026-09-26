@@ -46,7 +46,7 @@ public class ShizukuShellLoader {
                 }
                 return true;
             } else if (code == 2) {
-                System.err.println("tapi: TAPI is disabled. Enable it in Lab Features of the Nightzuku app.");
+                System.err.println("tapi: TAPI is disabled. Enable it in Lab Features of the Xhizuku app.");
                 System.err.flush();
                 System.exit(1);
                 return true;

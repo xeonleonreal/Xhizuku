@@ -18,14 +18,22 @@ public class ThemeHelper {
     public static final String KEY_LIGHT_THEME = "light_theme";
     public static final String KEY_BLACK_NIGHT_THEME = "black_night_theme";
     public static final String KEY_USE_SYSTEM_COLOR = "use_system_color";
+    public static final String KEY_THEME_COLOR = "theme_color";
+
+    public static final String THEME_COLOR_SYSTEM = "system";
+    public static final String THEME_COLOR_RED = "red";
 
     public static boolean isBlackNightTheme(Context context) {
-        return ShizukuSettings.getPreferences().getBoolean(KEY_BLACK_NIGHT_THEME, EnvironmentUtils.isWatch(context));
+        return ShizukuSettings.getPreferences().getBoolean(KEY_BLACK_NIGHT_THEME, true);
     }
 
     public static boolean isUsingSystemColor() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-                && ShizukuSettings.getPreferences().getBoolean(KEY_USE_SYSTEM_COLOR, true);
+                && ShizukuSettings.getPreferences().getBoolean(KEY_USE_SYSTEM_COLOR, false);
+    }
+
+    public static String getThemeColor() {
+        return ShizukuSettings.getPreferences().getString(KEY_THEME_COLOR, THEME_COLOR_RED);
     }
 
     public static String getTheme(Context context) {

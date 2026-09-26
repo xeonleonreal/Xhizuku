@@ -1,15 +1,15 @@
 <resources>
     <!-- Home - Status -->
-    <string name="home_status_service_is_running">Nightzuku запущен</string>
-    <string name="home_status_service_not_running">Nightzuku не запущен</string>
+    <string name="home_status_service_is_running">Xhizuku запущен</string>
+    <string name="home_status_service_not_running">Xhizuku не запущен</string>
     <string name="home_status_service_version">Версия %2$s, %1$s</string>
     <string name="home_status_service_version_update"><![CDATA[Версия %2$s, %1$s<br>Запустите снова для обновления до версии %3$s]]></string>
 
     <!-- Home - Adb -->
     <string name="home_adb_title"><![CDATA[Начните с подключения к компьютеру]]></string>
-    <string name="home_adb_description"><![CDATA[Для устройств без root необходимо использовать adb для запуска Nightzuku (требуется подключение к компьютеру). Этот процесс нужно повторять после каждого перезапуска устройства. Пожалуйста, <b><a href=\"%1$s\">прочитайте справку</a></b>.]]>
+    <string name="home_adb_description"><![CDATA[Для устройств без root необходимо использовать adb для запуска Xhizuku (требуется подключение к компьютеру). Этот процесс нужно повторять после каждого перезапуска устройства. Пожалуйста, <b><a href=\"%1$s\">прочитайте справку</a></b>.]]>
 
-Примечание: Nightzuku — это современная замена Shizuku. Пожалуйста, удалите старое официальное приложение Shizuku, чтобы избежать конфликтов.</string>
+Примечание: Xhizuku — это современная замена Shizuku. Пожалуйста, удалите старое официальное приложение Shizuku, чтобы избежать конфликтов.</string>
     <string name="home_adb_button_view_help">Справка</string>
     <string name="home_adb_button_view_command">Посмотреть команду</string>
     <string name="home_adb_dialog_view_command_message"><![CDATA[<font face=\"monospace\">%1$s</font><br><br>* Есть дополнительные условия, убедитесь, что вы прочитали справку.]]></string>
@@ -18,9 +18,9 @@
 
     <!-- Home - Wireless Adb -->
     <string name="home_wireless_adb_title"><![CDATA[Запуск через беспроводную отладку]]></string>
-    <string name="home_wireless_adb_description"><![CDATA[На Android 11 и выше можно включить беспроводную отладку и запустить Nightzuku прямо с устройства, без подключения к компьютеру.<p>Сначала ознакомьтесь с пошаговым руководством.]]>
+    <string name="home_wireless_adb_description"><![CDATA[На Android 11 и выше можно включить беспроводную отладку и запустить Xhizuku прямо с устройства, без подключения к компьютеру.<p>Сначала ознакомьтесь с пошаговым руководством.]]>
 
-Примечание: Nightzuku — это современная замена Shizuku. Пожалуйста, удалите старое официальное приложение Shizuku, чтобы избежать конфликтов.</string>
+Примечание: Xhizuku — это современная замена Shizuku. Пожалуйста, удалите старое официальное приложение Shizuku, чтобы избежать конфликтов.</string>
     <string name="home_wireless_adb_description_pre_11"><![CDATA[До Android 11 подключение к компьютеру необходимо для включения беспроводной отладки.]]></string>
     <string name="home_wireless_adb_view_guide_button">Пошаговое руководство</string>
     <string name="home_local_network_title">Доступ к локальной сети</string>
@@ -32,7 +32,7 @@
 
     <!-- Adb -->
     <string name="dialog_adb_discovery">Поиск службы беспроводной отладки</string>
-    <string name="dialog_adb_discovery_message">Включите \"Беспроводную отладку\" в \"Параметрах разработчика\". \"Беспроводная отладка\" автоматически отключается при смене сети.\n\nНе отключайте \"Параметры разработчика\" и \"Отладку по USB\", иначе Nightzuku будет остановлен.</string>
+    <string name="dialog_adb_discovery_message">Включите \"Беспроводную отладку\" в \"Параметрах разработчика\". \"Беспроводная отладка\" автоматически отключается при смене сети.\n\nНе отключайте \"Параметры разработчика\" и \"Отладку по USB\", иначе Xhizuku будет остановлен.</string>
     <string name="dialog_adb_discovery_message_toggle_wireless_debugging">Если поиск продолжается, попробуйте отключить и снова включить \"Беспроводную отладку\".</string>
     <string name="dialog_adb_port">Порт</string>
     <string name="dialog_adb_invalid_port">Порт — целое число от 1 до 65535.</string>
@@ -50,24 +50,24 @@
     <string name="adb_pair_required">Сначала пройдите этап сопряжения.</string>
     <string name="development_settings">Параметры разработчика</string>
     <string name="notification_settings">Настройки уведомлений</string>
-    <string name="adb_pairing_tutorial_title">Сопряжение Nightzuku с вашим устройством</string>
-    <string name="adb_pairing_tutorial_content_notification">Уведомление от Nightzuku поможет завершить сопряжение.</string>
+    <string name="adb_pairing_tutorial_title">Сопряжение Xhizuku с вашим устройством</string>
+    <string name="adb_pairing_tutorial_content_notification">Уведомление от Xhizuku поможет завершить сопряжение.</string>
     <string name="adb_pairing_tutorial_content_steps">Перейдите в \"Параметры разработчика\" → \"Беспроводная отладка\". Нажмите \"Сопряжение устройства с кодом\" — появится шестизначный код.</string>
     <string name="adb_pairing_tutorial_content_enter_pairing_code">Введите код в уведомлении для завершения сопряжения.</string>
-    <string name="adb_pairing_tutorial_content_notification_blocked">Для сопряжения нужно взаимодействовать с уведомлением от Nightzuku. Разрешите Nightzuku отправлять уведомления.</string>
+    <string name="adb_pairing_tutorial_content_notification_blocked">Для сопряжения нужно взаимодействовать с уведомлением от Xhizuku. Разрешите Xhizuku отправлять уведомления.</string>
     <string name="adb_pairing_tutorial_content_miui">Пользователям MIUI может потребоваться переключить стиль уведомлений на \"Android\" в \"Уведомления\" → \"Панель уведомлений\" в настройках системы.</string>
     <string name="adb_pairing_tutorial_content_miui_2">Иначе вы не сможете ввести код сопряжения из уведомления.</string>
     <string name="adb_pairing_tutorial_content_left_is_clickable">Обратите внимание: левая часть опции \"Беспроводная отладка\" кликабельна — она откроет новую страницу. Просто включить переключатель справа недостаточно.</string>
-    <string name="adb_pairing_tutorial_content_finish">Вернитесь в Nightzuku и запустите Nightzuku.</string>
-    <string name="adb_pairing_tutorial_content_network">Nightzuku нужен доступ к локальной сети. Это управляется разрешением сети.</string>
-    <string name="adb_pairing_tutorial_content_network_limation_not_foreground">Некоторые системы (например MIUI) запрещают приложениям доступ к сети, когда они не на переднем плане, даже при использовании foreground service. Отключите оптимацию батареи для Nightzuku на таких системах.</string>
+    <string name="adb_pairing_tutorial_content_finish">Вернитесь в Xhizuku и запустите Xhizuku.</string>
+    <string name="adb_pairing_tutorial_content_network">Xhizuku нужен доступ к локальной сети. Это управляется разрешением сети.</string>
+    <string name="adb_pairing_tutorial_content_network_limation_not_foreground">Некоторые системы (например MIUI) запрещают приложениям доступ к сети, когда они не на переднем плане, даже при использовании foreground service. Отключите оптимацию батареи для Xhizuku на таких системах.</string>
 
     <!-- Home - Root -->
     <string name="home_root_title"><![CDATA[Запуск (для устройств с root)]]></string>
-    <string name="home_root_description"><![CDATA[Кроме того, Nightzuku может автоматически запускаться при загрузке. Если этого не происходит, проверьте, не ограничивает ли ваша система или сторонние инструменты Nightzuku.<br>Можете обратиться к %s.]]>
+    <string name="home_root_description"><![CDATA[Кроме того, Xhizuku может автоматически запускаться при загрузке. Если этого не происходит, проверьте, не ограничивает ли ваша система или сторонние инструменты Xhizuku.<br>Можете обратиться к %s.]]>
 
-Примечание: Nightzuku — это современная замена Shizuku. Пожалуйста, удалите старое официальное приложение Shizuku, чтобы избежать конфликтов.</string>
-    <string name="home_root_description_sui"><![CDATA[Если вы используете Magisk, попробуйте %1$s. Для root-пользователей это в конечном счёте заменит Nightzuku. Приложениям потребуется небольшая доработка для использования %2$s.]]></string>
+Примечание: Xhizuku — это современная замена Shizuku. Пожалуйста, удалите старое официальное приложение Shizuku, чтобы избежать конфликтов.</string>
+    <string name="home_root_description_sui"><![CDATA[Если вы используете Magisk, попробуйте %1$s. Для root-пользователей это в конечном счёте заменит Xhizuku. Приложениям потребуется небольшая доработка для использования %2$s.]]></string>
     <string name="home_root_button_start">Запуск</string>
     <string name="home_root_button_restart">Перезапуск</string>
 
@@ -80,11 +80,11 @@
         <item quantity="other">Авторизовано %d приложения</item>
     </plurals>
     <string name="home_app_management_view_authorized_apps"><![CDATA[Нажмите для управления авторизованными приложениями]]></string>
-    <string name="home_app_management_empty">Приложения, запросившие или объявившие Nightzuku, появятся здесь.</string>
+    <string name="home_app_management_empty">Приложения, запросившие или объявившие Xhizuku, появятся здесь.</string>
 
     <!-- Home - Learn more -->
-    <string name="home_learn_more_title">Узнать больше о Nightzuku</string>
-    <string name="home_learn_more_description">Научитесь разрабатывать с Nightzuku</string>
+    <string name="home_learn_more_title">Узнать больше о Xhizuku</string>
+    <string name="home_learn_more_description">Научитесь разрабатывать с Xhizuku</string>
 
     <!-- Home - Diagnostics -->
     <string name="home_refresh">Обновить</string>
@@ -95,27 +95,27 @@
 
     <!-- Home - Adb permissions limited -->
     <string name="home_adb_is_limited_title">Нужен дополнительный шаг</string>
-    <string name="home_adb_is_limited_description">Производитель вашего устройства ограничил права adb, и приложения, использующие Nightzuku, работать не будут.\n\nОбычно это ограничение можно снять, изменив параметры в \"Параметрах разработчика\". Подробности — в справке.\n\nВозможно, потребуется перезапустить Nightzuku.</string>
+    <string name="home_adb_is_limited_description">Производитель вашего устройства ограничил права adb, и приложения, использующие Xhizuku, работать не будут.\n\nОбычно это ограничение можно снять, изменив параметры в \"Параметрах разработчика\". Подробности — в справке.\n\nВозможно, потребуется перезапустить Xhizuku.</string>
 
     <!-- Application management -->
     <string name="app_management_select_all">Выбрать все</string>
     <string name="app_management_deselect_all">Снять выделение</string>
     <string name="app_management_dialog_adb_is_limited_title">Права adb ограничены</string>
     <string name="app_management_dialog_adb_is_limited_message"><![CDATA[Скорее всего, производитель устройства ограничил права adb.<p>Решение для вашей системы может быть в <b><a href=\"%1$s\">этом документе</a></b>.]]></string>
-    <string name="app_management_item_summary_requires_root">* требует работы Nightzuku с root</string>
+    <string name="app_management_item_summary_requires_root">* требует работы Xhizuku с root</string>
 
     <!-- Terminal -->
-    <string name="home_terminal_title">Использовать Nightzuku в терминале</string>
-    <string name="home_terminal_description">Запускайте команды через Nightzuku в терминале на ваш выбор</string>
+    <string name="home_terminal_title">Использовать Xhizuku в терминале</string>
+    <string name="home_terminal_description">Запускайте команды через Xhizuku в терминале на ваш выбор</string>
     <string name="terminal_tutorial_1">Экспортируйте файлы в удобное место. Вы получите два файла: %1$s и %2$s.</string>
-    <string name="terminal_tutorial_1_description">Если в выбранной папке уже есть файлы с такими именами, они будут удалены.\n\nЭкспорт использует SAF (Storage Access Framework). Известно, что MIUI ломает функции SAF. Если вы используете MIUI, возможно, придётся извлечь файл из APK Nightzuku или скачать с GitHub.</string>
+    <string name="terminal_tutorial_1_description">Если в выбранной папке уже есть файлы с такими именами, они будут удалены.\n\nЭкспорт использует SAF (Storage Access Framework). Известно, что MIUI ломает функции SAF. Если вы используете MIUI, возможно, придётся извлечь файл из APK Xhizuku или скачать с GitHub.</string>
     <string name="terminal_export_files">Экспорт файлов</string>
     <string name="terminal_tutorial_2">Откройте и отредактируйте %1$s в любом текстовом редакторе.</string>
-    <string name="terminal_tutorial_2_description">Например, чтобы использовать Nightzuku в %1$s, замените %2$s на %3$s (%4$s — имя пакета %1$s).</string>
-    <string name="terminal_tutorial_3">Переместите файлы в место, доступное терминальной программе. Вы сможете использовать %1$s для запуска команд через Nightzuku.</string>
+    <string name="terminal_tutorial_2_description">Например, чтобы использовать Xhizuku в %1$s, замените %2$s на %3$s (%4$s — имя пакета %1$s).</string>
+    <string name="terminal_tutorial_3">Переместите файлы в место, доступное терминальной программе. Вы сможете использовать %1$s для запуска команд через Xhizuku.</string>
     <string name="terminal_tutorial_3_description">Советы: предоставьте права на выполнение %1$s и добавьте его в %2$s — тогда %1$s можно будет запускать напрямую.</string>
     <string name="rish_description"><![CDATA[
-С помощью %1$s в любом терминале можно подключиться к оболочке, запущенной Nightzuku.
+С помощью %1$s в любом терминале можно подключиться к оболочке, запущенной Xhizuku.
 <p>Подробнее об использовании %1$s — нажмите для просмотра документации.
     ]]></string>
 
@@ -130,13 +130,13 @@
     <string name="settings_translation">Участвовать в переводе</string>
     <string name="settings_translation_summary">Помогите перевести %s на ваш язык</string>
     <string name="settings_start_on_boot">Запускать при загрузке (root)</string>
-    <string name="settings_start_on_boot_summary">Для устройств с root-правами Nightzuku может запускаться автоматически при включении</string>
+    <string name="settings_start_on_boot_summary">Для устройств с root-правами Xhizuku может запускаться автоматически при включении</string>
     <string name="settings_use_system_color">Использовать цвет системной темы</string>
 
     <!-- ADB modules -->
     <string name="modules_title">ADB-модули</string>
     <string name="modules_settings_title">Модули</string>
-    <string name="modules_settings_summary">Устанавливайте ZIP-модули и запускайте их действия через активный сервер Nightzuku ADB/root</string>
+    <string name="modules_settings_summary">Устанавливайте ZIP-модули и запускайте их действия через активный сервер Xhizuku ADB/root</string>
     <string name="modules_header_summary">Установлено: %1$d, включено: %2$d</string>
     <string name="modules_version_label">Версия: %s</string>
     <string name="modules_author_label">Автор: %s</string>
@@ -154,7 +154,7 @@
     <string name="modules_permission_service">Запуск сервиса</string>
     <string name="modules_permission_service_summary">Разрешить service.sh при включённых фоновых действиях.</string>
     <string name="modules_permission_web_bridge">WebUI shell-мост</string>
-    <string name="modules_permission_web_bridge_summary">Предоставить window.Nightzuku только для локального WebUI и только при отключённом интернете в WebView.</string>
+    <string name="modules_permission_web_bridge_summary">Предоставить window.Xhizuku только для локального WebUI и только при отключённом интернете в WebView.</string>
     <string name="modules_permission_web_network">Интернет в WebView</string>
     <string name="modules_permission_web_network_summary">Разрешить HTTPS-навигацию/ресурсы. Отключает暴露暴露暴露 shell-моста для этого WebView.</string>
     <string name="modules_permission_web_download">Загрузка WebUI()</string>
@@ -182,7 +182,7 @@
     <string name="modules_webui">WebUI модуля</string>
     <string name="modules_delete">Удалить</string>
     <string name="modules_delete_title">Удалить модуль?</string>
-    <string name="modules_delete_message">%s будет удалён из хранилища модулей Nightzuku.</string>
+    <string name="modules_delete_message">%s будет удалён из хранилища модулей Xhizuku.</string>
     <string name="modules_action_result">Действие завершено: код %d</string>
     <string name="modules_action_failed">Ошибка действия</string>
     <string name="modules_service_result">Сервис завершён: код %d</string>
@@ -206,13 +206,13 @@
     <string name="about_view_source_code"><![CDATA[Исходный код: %s]]></string>
 
     <!-- Stop -->
-    <string name="action_stop">Остановить Nightzuku</string>
-    <string name="dialog_stop_message">Служба Nightzuku будет остановлена.</string>
+    <string name="action_stop">Остановить Xhizuku</string>
+    <string name="dialog_stop_message">Служба Xhizuku будет остановлена.</string>
 
     <!-- Notification -->
     <string name="notification_channel_service_status">Статус запуска службы</string>
-    <string name="notification_service_starting">Служба Nightzuku запускается…</string>
-    <string name="notification_service_start_failed">Не удалось запустить службу Nightzuku.</string>
+    <string name="notification_service_starting">Служба Xhizuku запускается…</string>
+    <string name="notification_service_start_failed">Не удалось запустить службу Xhizuku.</string>
     <string name="notification_service_start_no_root">Не удалось получить root-доступ.</string>
     <string name="notification_working">Работает…</string>
     <string name="notification_channel_adb_pairing">Сопряжение беспроводной отладки</string>
@@ -222,13 +222,13 @@
     <string name="notification_adb_pairing_stop_searching">Остановить поиск</string>
     <string name="notification_adb_pairing_working_title">Сопряжение выполняется</string>
     <string name="notification_adb_pairing_succeed_title">Сопряжение успешно</string>
-    <string name="notification_adb_pairing_succeed_text">Теперь можно запустить службу Nightzuku.</string>
+    <string name="notification_adb_pairing_succeed_text">Теперь можно запустить службу Xhizuku.</string>
     <string name="notification_adb_pairing_failed_title">Ошибка сопряжения</string>
     <string name="notification_adb_pairing_retry">Повторить</string>
 
     <!-- Permission related, appears in system permission UI -->
-    <string name="permission_label">Доступ к Nightzuku</string>
-    <string name="permission_description">Разрешить приложению использовать Nightzuku.</string>
+    <string name="permission_label">Доступ к Xhizuku</string>
+    <string name="permission_description">Разрешить приложению использовать Xhizuku.</string>
     <string name="permission_warning_template"><![CDATA[Разрешить <b>%1$s</b> %2$s?]]></string>
     <string name="grant_dialog_button_allow_always">Разрешить всегда</string>
     <string name="grant_dialog_button_deny">«Отклонить»</string>
@@ -243,17 +243,17 @@
     <string name="toast_copied_to_clipboard_with_text"><![CDATA[<b>%s</b> скопировано в буфер обмена.]]></string>
 
     <!-- Messages for legacy -->
-    <string name="dialog_legacy_not_support_title">%1$s не поддерживает современный Nightzuku</string>
-    <string name="dialog_legacy_not_support_message"><![CDATA[Устаревший Nightzuku не поддерживается с марта 2019 года. Также он не работает на новых версиях Android.<p>Попросите разработчика <b>%1$s</b> обновить приложение.]]></string>
-    <string name="dialog_requesting_legacy_title">%1$s запрашивает устаревший Nightzuku</string>
-    <string name="dialog_requesting_legacy_message"><![CDATA[<b>%1$s</b> поддерживает современный Nightzuku, но запрашует устаревший. Возможно, Nightzuku не запущен — проверьте в приложении.<p>Устаревший Nightzuku не поддерживается с марта 2019 года.]]></string>
-    <string name="dialog_requesting_legacy_button_open_shizuku">Открыть Nightzuku</string>
+    <string name="dialog_legacy_not_support_title">%1$s не поддерживает современный Xhizuku</string>
+    <string name="dialog_legacy_not_support_message"><![CDATA[Устаревший Xhizuku не поддерживается с марта 2019 года. Также он не работает на новых версиях Android.<p>Попросите разработчика <b>%1$s</b> обновить приложение.]]></string>
+    <string name="dialog_requesting_legacy_title">%1$s запрашивает устаревший Xhizuku</string>
+    <string name="dialog_requesting_legacy_message"><![CDATA[<b>%1$s</b> поддерживает современный Xhizuku, но запрашует устаревший. Возможно, Xhizuku не запущен — проверьте в приложении.<p>Устаревший Xhizuku не поддерживается с марта 2019 года.]]></string>
+    <string name="dialog_requesting_legacy_button_open_shizuku">Открыть Xhizuku</string>
 
     <!-- Lab Features -->
     <string name="lab_features_title">Экспериментальные функции</string>
     <string name="lab_features_summary">Экспериментальные возможности</string>
-    <string name="shizuku_connectors_title">Подключатели Nightzuku</string>
-    <string name="shizuku_connectors_summary">Разрешить плагинам активировать Nightzuku</string>
+    <string name="shizuku_connectors_title">Подключатели Xhizuku</string>
+    <string name="shizuku_connectors_summary">Разрешить плагинам активировать Xhizuku</string>
     <string name="tapi_title">TAPI</string>
     <string name="tapi_summary">Включить Termux API и мост командной строки</string>
     <string name="tapi_warning_title">Включить TAPI?</string>

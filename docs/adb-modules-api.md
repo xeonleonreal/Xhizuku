@@ -1,8 +1,8 @@
-# Nightzuku ADB Modules API
+# Xhizuku ADB Modules API
 
-ADB Modules are ZIP packages installed into Nightzuku private app storage and executed through the currently active Nightzuku server. If Nightzuku is running from ADB, module scripts run with ADB shell privileges. If Nightzuku is running from root, scripts run with root privileges.
+ADB Modules are ZIP packages installed into Xhizuku private app storage and executed through the currently active Xhizuku server. If Xhizuku is running from ADB, module scripts run with ADB shell privileges. If Xhizuku is running from root, scripts run with root privileges.
 
-This is not a root overlay system. It is a Nightzuku-backed module runner for actions, WebUI, service hooks, and controlled ADB/root shell access.
+This is not a root overlay system. It is a Xhizuku-backed module runner for actions, WebUI, service hooks, and controlled ADB/root shell access.
 
 ## Package Format
 
@@ -45,8 +45,8 @@ Rules:
 
 - `id` must match `[A-Za-z][A-Za-z0-9._-]{1,63}`.
 - `banner` can point to `.png`, `.jpg`, `.jpeg`, or `.webp`.
-- If `banner` is omitted, Nightzuku checks `banner.png`, `banner.jpg`, `banner.jpeg`, then `banner.webp`.
-- If `webui` is omitted, Nightzuku checks `webroot`, `webui`, then `web`.
+- If `banner` is omitted, Xhizuku checks `banner.png`, `banner.jpg`, `banner.jpeg`, then `banner.webp`.
+- If `webui` is omitted, Xhizuku checks `webroot`, `webui`, then `web`.
 - WebUI is available only when `<webui>/index.html` exists.
 - `action` defaults to `action.sh`.
 - `service.sh` is detected automatically.
@@ -56,13 +56,13 @@ Rules:
 Install flow:
 
 1. User selects a module ZIP with Android file picker.
-2. Nightzuku copies it into cache.
-3. Nightzuku validates `module.prop`.
-4. Nightzuku extracts into a staging directory.
-5. Nightzuku rejects unsafe paths.
-6. Nightzuku marks `.sh` files executable.
-7. Nightzuku replaces any existing module with the same `id`.
-8. Nightzuku stores the module under app-private storage.
+2. Xhizuku copies it into cache.
+3. Xhizuku validates `module.prop`.
+4. Xhizuku extracts into a staging directory.
+5. Xhizuku rejects unsafe paths.
+6. Xhizuku marks `.sh` files executable.
+7. Xhizuku replaces any existing module with the same `id`.
+8. Xhizuku stores the module under app-private storage.
 
 Safety limits:
 
@@ -73,7 +73,7 @@ Safety limits:
 
 ## Runtime Environment
 
-Scripts run through Nightzuku server process creation. The command is:
+Scripts run through Xhizuku server process creation. The command is:
 
 ```sh
 sh /path/to/module/action.sh
@@ -90,7 +90,7 @@ Working directory is the module directory.
 Environment variables:
 
 ```sh
-MODDIR=/data/user/0/kerneldroid.nightzuku/files/adb_modules/<id>
+MODDIR=/data/user/0/xeonleon.xhizuku/files/adb_modules/<id>
 ASH_STANDALONE=1
 SHIZUKU_MODULE_ID=<id>
 SHIZUKU_MODULE_MODE=safe|full
@@ -123,7 +123,7 @@ id
 Execution policy:
 - **Safe mode**: Blocked.
 - **Full access mode**: Allowed if "Allow background actions" is enabled.
-- Service scripts run once per Nightzuku binder session.
+- Service scripts run once per Xhizuku binder session.
 - Last output is written to `logs/service-last.log`.
 - Timeout (120s) returns exit code `124`.
 
@@ -223,7 +223,7 @@ Implemented:
 - WebUI HTTPS file download into the module WebUI root.
 - Manual `action.sh`.
 - Policy-gated `service.sh`.
-- One service run per Nightzuku binder session.
+- One service run per Xhizuku binder session.
 - Last action/service logs.
 - Direct JavaScript-to-shell bridge with optional timeout/stdin/cwd/env.
 

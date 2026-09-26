@@ -55,13 +55,13 @@ public class TapiManager {
                 if (binder != null) {
                     handler.post(() -> onBinderReceived(binder));
                 } else {
-                    System.err.println("tapi: Nightzuku server is not running");
+                    System.err.println("tapi: Xhizuku server is not running");
                     System.err.flush();
                     System.exit(1);
                 }
                 return true;
             } else if (code == 2) {
-                System.err.println("tapi: TAPI is disabled. Enable it in Lab Features of the Nightzuku app.");
+                System.err.println("tapi: TAPI is disabled. Enable it in Lab Features of the Xhizuku app.");
                 System.err.flush();
                 System.exit(1);
                 return true;
@@ -143,7 +143,7 @@ public class TapiManager {
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
                             .putExtra("data", data),
-                    "Request binder from Nightzuku"
+                    "Request binder from Xhizuku"
             );
 
             am.startActivityAsUser(null, callingPackage, activityIntent, null, null, null, 0, 0, null, null, Os.getuid() / 100000);
@@ -194,7 +194,7 @@ public class TapiManager {
         int version = getServiceInt(TRANSACTION_getVersion);
         int uid = getServiceInt(TRANSACTION_getUid);
 
-        System.out.println("Nightzuku server status:");
+        System.out.println("Xhizuku server status:");
         System.out.println("  Running: " + (serverRunning ? "yes" : "no"));
         System.out.println("  Server version: " + version);
         System.out.println("  Server UID: " + uid);
@@ -202,8 +202,8 @@ public class TapiManager {
     }
 
     private static void cmdStart() {
-        System.out.println("tapi: Server start is managed by the Nightzuku starter.");
-        System.out.println("tapi: Use the Nightzuku app or starter script to start the server.");
+        System.out.println("tapi: Server start is managed by the Xhizuku starter.");
+        System.out.println("tapi: Use the Xhizuku app or starter script to start the server.");
         System.out.flush();
     }
 
@@ -219,7 +219,7 @@ public class TapiManager {
                 data.recycle();
                 reply.recycle();
             }
-            System.out.println("tapi: Nightzuku server stop requested.");
+            System.out.println("tapi: Xhizuku server stop requested.");
             System.out.flush();
         } catch (RemoteException e) {
             System.err.println("tapi: Failed to stop server: " + e.getMessage());
@@ -230,7 +230,7 @@ public class TapiManager {
 
     private static void cmdGrant() {
         if (args.length < 1) {
-            System.err.println("tapi: Usage: tapi nightzuku grant <package>");
+            System.err.println("tapi: Usage: tapi xhizuku grant <package>");
             System.err.flush();
             System.exit(1);
         }
@@ -250,7 +250,7 @@ public class TapiManager {
 
     private static void cmdRevoke() {
         if (args.length < 1) {
-            System.err.println("tapi: Usage: tapi nightzuku revoke <package>");
+            System.err.println("tapi: Usage: tapi xhizuku revoke <package>");
             System.err.flush();
             System.exit(1);
         }
@@ -292,9 +292,9 @@ public class TapiManager {
         try {
             String output = execRemoteProcess(cmd);
             if (output == null || output.isEmpty()) {
-                System.out.println("tapi: No Nightzuku modules installed");
+                System.out.println("tapi: No Xhizuku modules installed");
             } else {
-                System.out.println("Installed Nightzuku modules:");
+                System.out.println("Installed Xhizuku modules:");
                 System.out.println(output);
             }
             System.out.flush();
@@ -422,27 +422,27 @@ public class TapiManager {
     }
 
     private static void showHelp() {
-        System.out.println("tapi - Termux API bridge for Nightzuku");
+        System.out.println("tapi - Termux API bridge for Xhizuku");
         System.out.println();
         System.out.println("Usage: tapi <command> [arguments]");
         System.out.println();
         System.out.println("Management commands:");
-        System.out.println("  nightzuku status              Show Nightzuku server status");
-        System.out.println("  nightzuku start               Start Nightzuku server (managed by starter)");
-        System.out.println("  nightzuku stop                Stop Nightzuku server");
-        System.out.println("  nightzuku grant <package>     Grant Shizuku permission to a package");
-        System.out.println("  nightzuku revoke <package>    Revoke Shizuku permission from a package");
-        System.out.println("  nightzuku modules             List installed Nightzuku modules");
+        System.out.println("  xhizuku status              Show Xhizuku server status");
+        System.out.println("  xhizuku start               Start Xhizuku server (managed by starter)");
+        System.out.println("  xhizuku stop                Stop Xhizuku server");
+        System.out.println("  xhizuku grant <package>     Grant Shizuku permission to a package");
+        System.out.println("  xhizuku revoke <package>    Revoke Shizuku permission from a package");
+        System.out.println("  xhizuku modules             List installed Xhizuku modules");
         System.out.println("  --help, -h                    Show this help message");
         System.out.println();
         System.out.println("Shell commands:");
         System.out.println("  <shell args>                  Pass arguments to ShizukuShellLoader");
         System.out.println();
         System.out.println("Examples:");
-        System.out.println("  tapi nightzuku status");
-        System.out.println("  tapi nightzuku grant com.example.app");
-        System.out.println("  tapi nightzuku revoke com.example.app");
-        System.out.println("  tapi nightzuku modules");
+        System.out.println("  tapi xhizuku status");
+        System.out.println("  tapi xhizuku grant com.example.app");
+        System.out.println("  tapi xhizuku revoke com.example.app");
+        System.out.println("  tapi xhizuku modules");
         System.out.println("  tapi -- ls -la");
         System.out.flush();
     }
@@ -476,20 +476,20 @@ public class TapiManager {
             System.exit(0);
         }
 
-        boolean isNightzukuCommand = false;
+        boolean isXhizukuCommand = false;
         int commandStartIndex = 0;
 
-        if ("nightzuku".equals(rawArgs[0])) {
-            isNightzukuCommand = true;
+        if ("xhizuku".equals(rawArgs[0]) || "nightzuku".equals(rawArgs[0])) {
+            isXhizukuCommand = true;
             commandStartIndex = 1;
         } else if ("status".equals(rawArgs[0]) || "start".equals(rawArgs[0]) || "stop".equals(rawArgs[0])
                 || "grant".equals(rawArgs[0]) || "revoke".equals(rawArgs[0])
                 || "modules".equals(rawArgs[0]) || "--modules".equals(rawArgs[0])) {
-            isNightzukuCommand = true;
+            isXhizukuCommand = true;
             commandStartIndex = 0;
         }
 
-        if (!isNightzukuCommand) {
+        if (!isXhizukuCommand) {
             try {
                 Class<?> shellLoaderClass = Class.forName("rikka.shizuku.shell.ShizukuShellLoader");
                 shellLoaderClass.getDeclaredMethod("main", String[].class).invoke(null, (Object) rawArgs);
@@ -503,7 +503,7 @@ public class TapiManager {
         }
 
         if (commandStartIndex >= rawArgs.length) {
-            System.err.println("tapi: Missing command after 'nightzuku'");
+            System.err.println("tapi: Missing command after 'xhizuku'");
             System.err.println("tapi: Run 'tapi --help' for usage information.");
             System.err.flush();
             System.exit(1);
@@ -552,8 +552,8 @@ public class TapiManager {
 
         handler.postDelayed(() -> abort(
                 String.format(
-                        "Request timeout. The connection between the current app (%1$s) and Nightzuku app may be blocked by your system. " +
-                                "Please disable all battery optimization features for both current app (%1$s) and Nightzuku app.",
+                        "Request timeout. The connection between the current app (%1$s) and Xhizuku app may be blocked by your system. " +
+                                "Please disable all battery optimization features for both current app (%1$s) and Xhizuku app.",
                         callingPackage)
         ), 5000);
 

@@ -30,7 +30,6 @@ import androidx.tv.material3.Text as TvText
 import moe.shizuku.manager.R
 import moe.shizuku.manager.module.ModuleSettings
 import moe.shizuku.manager.ui.compose.ShizukuIcon
-import rikka.shizuku.Shizuku
 
 @Composable
 fun TvLabMenuScreen(
@@ -39,7 +38,7 @@ fun TvLabMenuScreen(
     val context = LocalContext.current
     var connectorEnabled by remember { mutableStateOf(ModuleSettings.isConnectorEnabled()) }
     var tapiEnabled by remember { mutableStateOf(ModuleSettings.isTapiEnabled()) }
-    var nightDogEnabled by remember { mutableStateOf(try { Shizuku.getNightDogEnabled() } catch (_: Throwable) { false }) }
+    var nightDogEnabled by remember { mutableStateOf(try { NightDogController.isEnabled() } catch (_: Throwable) { false }) }
     var showUnsafeDialog by remember { mutableStateOf(false) }
     var showTapiWarningDialog by remember { mutableStateOf(false) }
     var showNightDogDialog by remember { mutableStateOf(false) }
@@ -85,7 +84,7 @@ fun TvLabMenuScreen(
                     checked = nightDogEnabled,
                     onToggle = {
                         if (!nightDogEnabled) showNightDogDialog = true
-                        else { Shizuku.setNightDogEnabled(false); nightDogEnabled = false }
+                        else { NightDogController.setEnabled(false); nightDogEnabled = false }
                     }
                 )
             }
@@ -99,9 +98,7 @@ fun TvLabMenuScreen(
                         if (!tapiEnabled) showTapiWarningDialog = true
                         else {
                             tapiEnabled = false
-                            moe.shizuku.tapi.TapiSettings.init(context)
                             ModuleSettings.setTapiEnabled(false)
-                            moe.shizuku.tapi.TapiSettings.setEnabled(false)
                         }
                     }
                 )
@@ -173,9 +170,7 @@ fun TvLabMenuScreen(
                     onClick = {
                         showTapiWarningDialog = false
                         tapiEnabled = true
-                        moe.shizuku.tapi.TapiSettings.init(context)
                         ModuleSettings.setTapiEnabled(true)
-                        moe.shizuku.tapi.TapiSettings.setEnabled(true)
                     },
                     shape = TvClickableSurfaceDefaults.shape(TvMaterialTheme.shapes.small),
                     colors = TvClickableSurfaceDefaults.colors(
@@ -217,7 +212,7 @@ fun TvLabMenuScreen(
                     onClick = {
                         showNightDogDialog = false
                         nightDogEnabled = true
-                        Shizuku.setNightDogEnabled(true)
+                        NightDogController.setEnabled(true)
                     },
                     shape = TvClickableSurfaceDefaults.shape(TvMaterialTheme.shapes.small),
                     colors = TvClickableSurfaceDefaults.colors(

@@ -8,7 +8,7 @@ android {
     defaultConfig {
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionName
-        buildConfigField "String", "MANAGER_APPLICATION_ID", "\"kerneldroid.nightzuku\""
+        buildConfigField "String", "MANAGER_APPLICATION_ID", "\"xeonleon.xhizuku\""
     }
     buildTypes {
         debug {
@@ -77,66 +77,12 @@ tasks.register("copyTapiScript") {
 
 def registerTapiDexBuildTask(String variantName) {
     def capitalized = variantName.capitalize()
+    // TAPI AAR module (api/tapi) is not available in the upstream Shizuku-API
+    // submodule. TAPI functionality now lives in :shell (TapiManager).
+    // Keep stub tasks so :manager hooks don't break if re-added.
     tasks.register("build${capitalized}TapiDex") {
-        dependsOn(":tapi:assemble${capitalized}")
-
-        def aarDir = rootProject.layout.projectDirectory.dir("api/tapi/build/outputs/aar")
-        def outputDir = rootProject.layout.projectDirectory.dir("manager/src/main/assets")
-
         doLast {
-            def aarFile = file("${aarDir}/tapi-${variantName}.aar")
-            if (!aarFile.exists()) {
-                throw new GradleException("TAPI ${variantName} AAR was not found at ${aarFile}")
-            }
-
-            def tmpDir = file("${layout.buildDirectory.get()}/tmp/tapi-dex-${variantName}")
-            tmpDir.mkdirs()
-
-            copy {
-                from zipTree(aarFile)
-                into tmpDir
-                include 'classes.jar'
-            }
-
-            def classesJar = file("${tmpDir}/classes.jar")
-            if (!classesJar.exists()) {
-                throw new GradleException("classes.jar not found in TAPI AAR")
-            }
-
-            def sdkDir
-            def sdkPath = System.getenv('ANDROID_HOME') ?: System.getenv('ANDROID_SDK_ROOT')
-            if (sdkPath != null && !sdkPath.isBlank()) {
-                sdkDir = file(sdkPath)
-            } else {
-                def localProperties = rootProject.file('local.properties')
-                if (localProperties.exists()) {
-                    def props = new Properties()
-                    localProperties.withInputStream { props.load(it) }
-                    sdkDir = file(props['sdk.dir'])
-                } else {
-                    throw new GradleException("Android SDK not found. Set ANDROID_HOME or sdk.dir in local.properties")
-                }
-            }
-            def buildToolsVersion = android.buildToolsVersion
-            def d8 = file("${sdkDir}/build-tools/${buildToolsVersion}/d8")
-
-            def process = new ProcessBuilder(d8.path, '--output', tmpDir.path, classesJar.path)
-                .redirectErrorStream(true)
-                .start()
-            process.waitFor()
-
-            def dexFile = file("${tmpDir}/classes.dex")
-            if (!dexFile.exists()) {
-                throw new GradleException("D8 did not produce classes.dex")
-            }
-
-            copy {
-                from dexFile
-                into outputDir
-                rename { 'tapi.dex' }
-            }
-
-            tmpDir.deleteDir()
+            logger.lifecycle("TAPI dex build skipped: no :tapi module (functionality lives in :shell)")
         }
     }
 }

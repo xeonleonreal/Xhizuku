@@ -1,10 +1,9 @@
-package kerneldroid.shizutest
+package moe.shizuku.manager.shizutest
 
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -22,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -29,6 +29,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import moe.shizuku.manager.R
+import moe.shizuku.manager.app.AppActivity
+import moe.shizuku.manager.ui.compose.ShizukuExpressiveTheme
+import moe.shizuku.manager.ui.compose.ShizukuScaffold
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.ShizukuSystemProperties
@@ -38,17 +42,6 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.text.SimpleDateFormat
 import java.util.*
-
-
-
-
-
-
-
-
-
-
-
 
 enum class TestStatus {
     IDLE, RUNNING, GOOD, FAILED
@@ -70,12 +63,10 @@ data class TestResult(
     val details: String
 )
 
-
-class MainActivity : ComponentActivity() {
+class ShizuTestActivity : AppActivity() {
 
     private val binderReceived = mutableStateOf(false)
     private val permissionGranted = mutableStateOf(false)
-
 
     private val testsList = mutableStateListOf<DiagnosticTest>()
 
@@ -89,7 +80,7 @@ class MainActivity : ComponentActivity() {
         permissionGranted.value = false
     }
 
-    private val REQUEST_PERMISSION_RESULT_LISTENER = Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
+    private val REQUEST_PERMISSION_RESULT_LISTENER = Shizuku.OnRequestPermissionResultListener { _, grantResult ->
         permissionGranted.value = grantResult == PackageManager.PERMISSION_GRANTED
     }
 
@@ -101,33 +92,39 @@ class MainActivity : ComponentActivity() {
         Shizuku.addRequestPermissionResultListener(REQUEST_PERMISSION_RESULT_LISTENER)
 
         binderReceived.value = Shizuku.pingBinder()
-        permissionGranted.value = if (Shizuku.pingBinder()) Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED else false
-
+        permissionGranted.value = if (Shizuku.pingBinder()) {
+            Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
+        } else {
+            false
+        }
 
         if (testsList.isEmpty()) {
-            testsList.addAll(listOf(
-                DiagnosticTest("ping", "Binder Service Ping", "Verify binder connectivity state"),
-                DiagnosticTest("latency", "IPC Transaction Speed", "Measure IPC transaction roundtrip delay"),
-                DiagnosticTest("selinux", "SELinux Context Check", "Verify server SELinux confinement domain"),
-                DiagnosticTest("shell", "High-Privilege Shell Spawner", "Spawn process and execute 'id' command"),
-                DiagnosticTest("package", "Package Manager Query", "Query packages via high-privilege IPC"),
-                DiagnosticTest("properties", "System Properties Read", "Access restricted Android system properties")
-            ))
+            testsList.addAll(
+                listOf(
+                    DiagnosticTest("ping", "Binder Service Ping", "Verify binder connectivity state"),
+                    DiagnosticTest("latency", "IPC Transaction Speed", "Measure IPC transaction roundtrip delay"),
+                    DiagnosticTest("selinux", "SELinux Context Check", "Verify server SELinux confinement domain"),
+                    DiagnosticTest("shell", "High-Privilege Shell Spawner", "Spawn process and execute 'id' command"),
+                    DiagnosticTest("package", "Package Manager Query", "Query packages via high-privilege IPC"),
+                    DiagnosticTest("properties", "System Properties Read", "Access restricted Android system properties")
+                )
+            )
         }
 
         setContent {
-            MonetTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
+            ShizukuExpressiveTheme {
+                ShizukuScaffold(
+                    title = stringResource(R.string.extras_shizutest_title),
+                    onNavigateUp = { finish() }
+                ) { innerPadding ->
                     MinimalistDashboard(
                         binderActive = binderReceived.value,
                         permissionActive = permissionGranted.value,
                         tests = testsList,
                         onRequestPermission = { requestShizukuPermission() },
                         onRunAutoTest = { runAutoTest() },
-                        onDownloadLogs = { exportLogsToFile() }
+                        onDownloadLogs = { exportLogsToFile() },
+                        modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
@@ -143,7 +140,7 @@ class MainActivity : ComponentActivity() {
 
     private fun requestShizukuPermission() {
         if (!Shizuku.pingBinder()) {
-            Toast.makeText(this, "Error: Nightzuku is inactive.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Error: Xhizuku is inactive.", Toast.LENGTH_SHORT).show()
             return
         }
         try {
@@ -166,7 +163,6 @@ class MainActivity : ComponentActivity() {
 
     private fun runAutoTest() {
         lifecycleScope.launch {
-
             for (i in 0 until testsList.size) {
                 testsList[i] = testsList[i].copy(
                     status = TestStatus.IDLE,
@@ -175,7 +171,6 @@ class MainActivity : ComponentActivity() {
                     executionTimeMs = 0L
                 )
             }
-
 
             runTestItem("ping") {
                 val active = Shizuku.pingBinder()
@@ -186,10 +181,9 @@ class MainActivity : ComponentActivity() {
                         details = "Shizuku service binder is alive and accessible.\nAPI Version: ${Shizuku.getVersion()}\nServer UID: ${Shizuku.getUid()}"
                     )
                 } else {
-                    throw IllegalStateException("Binder service is inactive. Make sure the Nightzuku server is running in the background.")
+                    throw IllegalStateException("Binder service is inactive. Make sure the Xhizuku server is running in the background.")
                 }
             }
-
 
             runTestItem("latency") {
                 if (!Shizuku.pingBinder()) throw IllegalStateException("Binder is inactive.")
@@ -215,7 +209,6 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
-
             runTestItem("selinux") {
                 if (!Shizuku.pingBinder()) throw IllegalStateException("Binder is inactive.")
                 if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
@@ -232,7 +225,6 @@ class MainActivity : ComponentActivity() {
                     throw IllegalStateException("SELinux context returned empty or null.")
                 }
             }
-
 
             runTestItem("shell") {
                 if (!Shizuku.pingBinder()) throw IllegalStateException("Binder is inactive.")
@@ -251,7 +243,13 @@ class MainActivity : ComponentActivity() {
                 val error = process.errorStream.bufferedReader().use { it.readText() }.trim()
                 val exitCode = process.waitFor()
                 if (exitCode == 0) {
-                    val summary = if (output.contains("uid=0")) "root" else if (output.contains("uid=2000")) "shell" else "Success"
+                    val summary = if (output.contains("uid=0")) {
+                        "root"
+                    } else if (output.contains("uid=2000")) {
+                        "shell"
+                    } else {
+                        "Success"
+                    }
                     TestResult(
                         status = TestStatus.GOOD,
                         summary = summary,
@@ -261,7 +259,6 @@ class MainActivity : ComponentActivity() {
                     throw IllegalStateException("Shell process exited with code $exitCode.\nError output:\n$error")
                 }
             }
-
 
             runTestItem("package") {
                 if (!Shizuku.pingBinder()) throw IllegalStateException("Binder is inactive.")
@@ -275,7 +272,6 @@ class MainActivity : ComponentActivity() {
                     details = "Queried system IPackageManager package list through high-privilege binder wrap transaction:\n- Output: $count active application packages count."
                 )
             }
-
 
             runTestItem("properties") {
                 if (!Shizuku.pingBinder()) throw IllegalStateException("Binder is inactive.")
@@ -291,7 +287,6 @@ class MainActivity : ComponentActivity() {
                     details = "Restricted Android System Properties fetched via Shizuku binder successfully:\n- ro.product.brand = $brand\n- ro.product.model = $model\n- ro.build.fingerprint = $fingerprint"
                 )
             }
-
 
             exportLogsToFile()
         }
@@ -351,10 +346,10 @@ class MainActivity : ComponentActivity() {
     private fun exportLogsToFile() {
         try {
             val externalDir = getExternalFilesDir(null)
-            val logFile = File(externalDir, "shizutest_diagnostics.log")
+            val logFile = File(externalDir, "xhizuku_diagnostics.log")
             logFile.printWriter().use { out ->
                 out.println("==================================================")
-                out.println("SHIZUTEST AUTOMATED DIAGNOSTICS REPORT")
+                out.println("XHIZUKU INTEGRATION TEST REPORT")
                 out.println("Date: " + SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(Date()))
                 out.println("OS: Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
                 out.println("Device Model: ${Build.MODEL}")
@@ -374,10 +369,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-
-
-
 @Composable
 fun MinimalistDashboard(
     binderActive: Boolean,
@@ -385,14 +376,15 @@ fun MinimalistDashboard(
     tests: List<DiagnosticTest>,
     onRequestPermission: () -> Unit,
     onRunAutoTest: () -> Unit,
-    onDownloadLogs: () -> Unit
+    onDownloadLogs: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
     val outerGap = 20.dp
     val plaqueGap = 12.dp
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = outerGap, vertical = 12.dp)
@@ -400,7 +392,6 @@ fun MinimalistDashboard(
         verticalArrangement = Arrangement.spacedBy(plaqueGap)
     ) {
         Spacer(modifier = Modifier.height(12.dp))
-
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -441,7 +432,6 @@ fun MinimalistDashboard(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-
         PlaqueContainerMinimal(title = "Device Environment", icon = Icons.Rounded.Devices) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -453,8 +443,7 @@ fun MinimalistDashboard(
             }
         }
 
-
-        PlaqueContainerMinimal(title = "Nightzuku Service State", icon = Icons.Rounded.SettingsInputAntenna) {
+        PlaqueContainerMinimal(title = "Xhizuku Service State", icon = Icons.Rounded.SettingsInputAntenna) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -494,7 +483,6 @@ fun MinimalistDashboard(
                 }
             }
         }
-
 
         Card(
             modifier = Modifier
@@ -545,7 +533,6 @@ fun MinimalistDashboard(
             }
         }
 
-
         Text(
             text = "DIAGNOSTIC VERIFICATION CHECKS",
             style = MaterialTheme.typography.labelMedium,
@@ -569,7 +556,6 @@ fun TestItemCard(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-
 
     val isAutoExpanded = test.status == TestStatus.RUNNING || test.status == TestStatus.FAILED
     val isVisible = expanded || isAutoExpanded
@@ -609,7 +595,6 @@ fun TestItemCard(
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
-
 
                 StatusIndicator(status = test.status, summary = test.summary)
             }
@@ -720,10 +705,6 @@ fun StatusIndicator(status: TestStatus, summary: String) {
     }
 }
 
-
-
-
-
 @Composable
 fun PlaqueContainerMinimal(
     title: String,
@@ -748,7 +729,7 @@ fun PlaqueContainerMinimal(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = MaterialTheme.primaryColorEmulated(),
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
@@ -762,10 +743,6 @@ fun PlaqueContainerMinimal(
         }
     }
 }
-
-
-@Composable
-fun MaterialTheme.primaryColorEmulated(): Color = Color(0xFF82C7A5)
 
 @Composable
 fun EnvItemMinimal(label: String, value: String) {
@@ -794,33 +771,4 @@ fun StatusBadgeMinimal(active: Boolean, activeText: String, inactiveText: String
             color = textColor
         )
     }
-}
-
-@Composable
-fun MonetTheme(content: @Composable () -> Unit) {
-
-    val monetColorScheme = darkColorScheme(
-        primary = Color(0xFF82C7A5),
-        onPrimary = Color(0xFF003822),
-        primaryContainer = Color(0xFF005234),
-        onPrimaryContainer = Color(0xFF9DF4C0),
-        secondary = Color(0xFFBCCBB0),
-        onSecondary = Color(0xFF273421),
-        secondaryContainer = Color(0xFF3D4A36),
-        onSecondaryContainer = Color(0xFFD8E7CC),
-        tertiary = Color(0xFFE4C39B),
-        onTertiary = Color(0xFF422D12),
-        background = Color(0xFF191C1A),
-        surface = Color(0xFF222522),
-        surfaceContainerHighest = Color(0xFF2C302C),
-        onBackground = Color(0xFFE1E3DF),
-        onSurface = Color(0xFFE1E3DF),
-        errorContainer = Color(0xFF8C1D18),
-        onErrorContainer = Color(0xFFF9DEDC)
-    )
-
-    MaterialTheme(
-        colorScheme = monetColorScheme,
-        content = content
-    )
 }

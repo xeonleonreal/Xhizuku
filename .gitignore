@@ -19,5 +19,6 @@ signing.properties
 .jdk/
 *.apk
 *.jar
+gradle/gradle-daemon-jvm.properties
 view.xml
 packages.txt

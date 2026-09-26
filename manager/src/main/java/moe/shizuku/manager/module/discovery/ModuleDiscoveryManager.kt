@@ -212,7 +212,7 @@ class ModuleDiscoveryManager private constructor(context: Context) {
         private const val TAG = "ModuleDiscovery"
         private const val PREFS_NAME = "module_discovery_cache"
         private const val MAX_MODULES_PER_USER = 4
-        private const val OFFICIAL_OWNER = "kerneldroid"
+        private const val OFFICIAL_OWNER = "xeonleon"
 
         @Volatile
         private var instance: ModuleDiscoveryManager? = null

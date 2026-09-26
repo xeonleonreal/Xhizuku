@@ -1,6 +1,6 @@
 # Wear OS Compatibility (Android 15-17 / Wear OS 5-7)
 
-This document details the Wear OS compatibility enhancements introduced in the Nightzuku modern fork.
+This document details the Wear OS compatibility enhancements introduced in the Xhizuku modern fork.
 
 ## Supported Versions
 * Wear OS 5.1 (Android 15)
@@ -9,7 +9,7 @@ This document details the Wear OS compatibility enhancements introduced in the N
 * Wear OS 7 (Android 17 / API 37) - **Full Support**
 
 ## Backward Compatibility
-Nightzuku maintains full backward compatibility with older Wear OS versions (down to API 25).
+Xhizuku maintains full backward compatibility with older Wear OS versions (down to API 25).
 * **Dynamic Checks:** We use `Build.VERSION.SDK_INT` and `Android17Compat` to ensure modern system APIs (like multi-device awareness) are used only when available.
 * **Stable UI:** The Compose Material 3 UI degrades gracefully on older devices, ensuring a functional experience even without latest platform features like advanced Monet transitions.
 
@@ -34,13 +34,13 @@ Legacy dialogs have been replaced with native `androidx.wear.compose.material3.A
 * **Platform UI:** Uses native Wear OS Material 3 buttons and layouts.
 
 ### 4. WebView Fallback for WearOS
-On WearOS devices (especially emulators or specialized builds) that lack a functional WebView provider, Nightzuku now implements a robust fallback.
+On WearOS devices (especially emulators or specialized builds) that lack a functional WebView provider, Xhizuku now implements a robust fallback.
 * **Crash Prevention:** Activity initialization is wrapped in a `try-catch` block to intercept `UnsupportedOperationException` from the system `WebViewFactory`.
 * **User Feedback:** Instead of crashing or showing a white screen, a native WearOS dialog informs the user that WebUI is unsupported on their hardware.
 
 
 ## Verification
-* The Nightzuku server successfully binds and operates on Wear OS 7 (API 37) and Wear OS 6.1 (API 36.1) emulators and real devices.
+* The Xhizuku server successfully binds and operates on Wear OS 7 (API 37) and Wear OS 6.1 (API 36.1) emulators and real devices.
 * Application UI provides a first-class native experience on 1.4-inch and 1.5-inch round displays across all supported versions.
 * All core functionalities, including ADB bindings and root execution, are functional.
 

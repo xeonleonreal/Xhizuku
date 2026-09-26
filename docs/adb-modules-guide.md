@@ -5,17 +5,17 @@ This guide is for module authors and testers. For the exact API contract, see
 
 ## What This System Is
 
-ADB Modules are ZIP packages installed into Nightzuku private storage and executed through
-the active Nightzuku server.
+ADB Modules are ZIP packages installed into Xhizuku private storage and executed through
+the active Xhizuku server.
 
-- ADB-started Nightzuku: scripts run with ADB shell privileges.
-- Root-started Nightzuku: scripts run with root privileges.
+- ADB-started Xhizuku: scripts run with ADB shell privileges.
+- Root-started Xhizuku: scripts run with root privileges.
 - Safe mode: manual actions only.
 - Full access: allows stronger module behavior.
 - Background actions: required before `service.sh` can run.
 
 This is a real module runner, not a visual stub. It installs ZIPs, parses metadata,
-stores module files, runs shell scripts through Nightzuku, opens local WebUI, tracks enabled
+stores module files, runs shell scripts through Xhizuku, opens local WebUI, tracks enabled
 state, deletes modules, and writes last-run logs.
 
 It is not a Magisk/KSU systemless overlay implementation. There are no mount hooks,
@@ -98,7 +98,7 @@ action=scripts/action.sh
 Scripts run from the module directory. Use these variables:
 
 ```sh
-MODDIR=/data/user/0/kerneldroid.nightzuku/files/adb_modules/<id>
+MODDIR=/data/user/0/xeonleon.xhizuku/files/adb_modules/<id>
 ASH_STANDALONE=1
 SHIZUKU_MODULE_ID=<id>
 SHIZUKU_MODULE_MODE=safe|custom|full
@@ -116,7 +116,7 @@ Use `service.sh` for background setup. It runs when:
 - The module is enabled.
 - Access mode is Full, or Custom with Service enabled.
 - Background actions are enabled in Settings.
-- Nightzuku binder is available.
+- Xhizuku binder is available.
 
 The manager auto-runs enabled services once per binder session.
 
