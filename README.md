@@ -1,4 +1,4 @@
-# Xhizuku
+# Xhizuku <img src="github/icon.webp" height="40" style="vertical-align: middle;"/>
 
 **Xhizuku** is a fork of **Nightzuku**, maintained by xeonleonreal. It provides a robust, high-performance interface for applications to use system APIs directly with elevated permissions (root/ADB).
 
