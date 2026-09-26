@@ -22,3 +22,12 @@ signing.properties
 gradle/gradle-daemon-jvm.properties
 view.xml
 packages.txt
+
+# Local build/dev files
+.bundle/
+vendor/
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+.gradle/
