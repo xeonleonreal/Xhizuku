@@ -11,4 +11,4 @@ Features:
 
 Note: Xhizuku uses a custom package ID (xeonleon.xhizuku). Uninstall the official Shizuku app or other variants before installing to avoid conflicts.
 
-Xhizuku is a fork of Shizuku (https://github.com/RikkaApps/Shizuku), released under the Apache License 2.0.
+Xhizuku is a fork of Shizuku (https://github.com/kerneldroid/Shizuku), released under the Apache License 2.0.

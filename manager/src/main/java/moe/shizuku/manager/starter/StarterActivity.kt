@@ -68,27 +68,33 @@ class StarterActivity : AppActivity() {
 
         val startedWithRoot = intent.getBooleanExtra(EXTRA_IS_ROOT, true)
 
+        // The starter process stays alive (it supervises the server and restarts
+        // it on crashes), so its output never ends with an exit line. Watch the
+        // binder instead: when the server is up it delivers a binder, whether it
+        // was just started or was already running.
+        val binderListener = object : Shizuku.OnBinderReceivedListener {
+            override fun onBinderReceived() {
+                Shizuku.removeBinderReceivedListener(this)
+                binderReceivedListener = null
+                runOnUiThread {
+                    if (isFinishing) return@runOnUiThread
+                    waitingForService = true
+                    viewModel.appendOutput("Service started, this window will be automatically closed in 3 seconds")
+                    window?.decorView?.postDelayed({
+                        if (!isFinishing) finish()
+                    }, 3000)
+                }
+            }
+        }
+        binderReceivedListener = binderListener
+        Shizuku.addBinderReceivedListenerSticky(binderListener)
+
         viewModel.output.observe(this) {
             val output = it.data.orEmpty().trim()
             if (!waitingForService && output.endsWith("info: shizuku_starter exit with 0")) {
                 waitingForService = true
                 viewModel.appendOutput("")
                 viewModel.appendOutput("Waiting for service...")
-
-                val listener = object : Shizuku.OnBinderReceivedListener {
-                    override fun onBinderReceived() {
-                        Shizuku.removeBinderReceivedListener(this)
-                        binderReceivedListener = null
-                        runOnUiThread {
-                            viewModel.appendOutput("Service started, this window will be automatically closed in 3 seconds")
-                            window?.decorView?.postDelayed({
-                                if (!isFinishing) finish()
-                            }, 3000)
-                        }
-                    }
-                }
-                binderReceivedListener = listener
-                Shizuku.addBinderReceivedListenerSticky(listener)
             }
         }
 
