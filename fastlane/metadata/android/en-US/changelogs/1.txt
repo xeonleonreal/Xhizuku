@@ -1,0 +1,9 @@
+Xhizuku 1.0.0 r1 - first public release.
+
+- Magisk-style bottom navigation (Status, Extras, Settings)
+- Light-red theme with selectable accent colors
+- Server status notification with died/online alerts
+- XStatus device monitor (CPU, GPU, RAM, swap)
+- First-run onboarding wizard
+- ShizuTest integration suite built into the app
+- Per-card expandable descriptions on the status page

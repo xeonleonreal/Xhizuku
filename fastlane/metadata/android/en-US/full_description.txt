@@ -1,0 +1,14 @@
+Xhizuku lets apps use Android system APIs directly with elevated permissions. Start the server once with root or ADB (including wireless debugging), approve apps, and they can call system APIs almost as if they were the system itself.
+
+Features:
+- Start via root, wireless debugging, or classic ADB
+- Per-app permission grants with an onboarding wizard
+- ADB module runner: install ZIP modules with actions, services and WebUI
+- XStatus monitor: CPU, GPU, RAM and swap in an ongoing notification
+- Server status notification with alerts if the server dies
+- Built-in integration test suite (ShizuTest) and diagnostics export
+- Material 3 Expressive UI with theme color choices and Magisk-style tabs
+
+Note: Xhizuku uses a custom package ID (xeonleon.xhizuku). Uninstall the official Shizuku app or other variants before installing to avoid conflicts.
+
+Xhizuku is a fork of Shizuku (https://github.com/RikkaApps/Shizuku), released under the Apache License 2.0.
