@@ -22,6 +22,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import moe.shizuku.manager.Helps
 import moe.shizuku.manager.R
 import moe.shizuku.manager.ShizukuSettings
@@ -30,12 +32,14 @@ import moe.shizuku.manager.management.ApplicationManagementActivity
 import moe.shizuku.manager.management.appsViewModel
 import moe.shizuku.manager.module.AdbModuleManager
 import moe.shizuku.manager.module.ModulesActivity
+import moe.shizuku.manager.monitor.MonitorSettings
 import moe.shizuku.manager.monitor.ServerMonitorService
 import moe.shizuku.manager.onboarding.OnboardingActivity
 import moe.shizuku.manager.settings.SettingsActivity
 import moe.shizuku.manager.shell.ShellTutorialActivity
 import moe.shizuku.manager.starter.Starter
 import moe.shizuku.manager.starter.StarterActivity
+import moe.shizuku.manager.update.AppUpdateChecker
 import moe.shizuku.manager.ui.compose.ShizukuExpressiveTheme
 import moe.shizuku.manager.ui.compose.openMainTab
 import moe.shizuku.manager.utils.CustomTabsHelper
@@ -49,12 +53,14 @@ import rikka.shizuku.Shizuku
 abstract class HomeActivity : AppActivity() {
 
     private val binderReceivedListener = Shizuku.OnBinderReceivedListener {
+        MonitorSettings.setServerStartedAt(System.currentTimeMillis())
         checkServerStatus()
         appsModel.load()
     }
 
     private val binderDeadListener = Shizuku.OnBinderDeadListener {
         AdbModuleManager.resetServiceRunGuard()
+        MonitorSettings.setServerStartedAt(0L)
         checkServerStatus()
     }
 
@@ -163,7 +169,7 @@ abstract class HomeActivity : AppActivity() {
                         HomeAboutDialog(
                             onDismiss = { showAboutDialog = false },
                             onSourceCode = {
-                                CustomTabsHelper.launchUrlOrCopy(this@HomeActivity, "https://github.com/RikkaApps/Shizuku")
+                                CustomTabsHelper.launchUrlOrCopy(this@HomeActivity, "https://github.com/xeonleonreal/Xhizuku")
                             }
                         )
                     }
@@ -173,6 +179,7 @@ abstract class HomeActivity : AppActivity() {
                             onDismiss = { showStopDialog = false },
                             onConfirm = {
                                 try {
+                                    MonitorSettings.noteManualStop()
                                     Shizuku.exit()
                                 } catch (_: Throwable) {
                                 }
@@ -249,6 +256,9 @@ abstract class HomeActivity : AppActivity() {
         checkServerStatus()
         permissionRefreshTick.intValue++
         ServerMonitorService.startIfEnabled(this)
+        lifecycleScope.launch {
+            AppUpdateChecker.checkAsync(this@HomeActivity)
+        }
     }
 
     private fun checkServerStatus() {

@@ -27,6 +27,7 @@ import moe.shizuku.manager.adb.AdbKey
 import moe.shizuku.manager.adb.AdbKeyException
 import moe.shizuku.manager.adb.PreferenceAdbKeyStore
 import moe.shizuku.manager.app.AppActivity
+import moe.shizuku.manager.monitor.MonitorSettings
 import moe.shizuku.manager.ui.compose.ExpressiveCard
 import moe.shizuku.manager.ui.compose.HtmlText
 import moe.shizuku.manager.ui.compose.MonospaceLog
@@ -67,6 +68,18 @@ class StarterActivity : AppActivity() {
         super.onCreate(savedInstanceState)
 
         val startedWithRoot = intent.getBooleanExtra(EXTRA_IS_ROOT, true)
+
+        // Remember the wireless ADB endpoint so the UI can show the port later:
+        // Android does not expose the wireless-debugging port in a system property.
+        if (startedWithRoot) {
+            MonitorSettings.clearLastAdb()
+        } else {
+            val host = intent.getStringExtra(EXTRA_HOST)
+            val port = intent.getIntExtra(EXTRA_PORT, 0)
+            if (!host.isNullOrBlank() && port > 0) {
+                MonitorSettings.setLastAdb(host, port)
+            }
+        }
 
         // The starter process stays alive (it supervises the server and restarts
         // it on crashes), so its output never ends with an exit line. Watch the

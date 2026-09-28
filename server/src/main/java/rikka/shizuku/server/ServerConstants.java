@@ -15,4 +15,11 @@ public class ServerConstants {
     public static final String TERMUX_PACKAGE_NAME = "com.termux";
     public static final String TAPI_META_DATA = "xeonleon.xhizuku.TAPI_SUPPORT";
     public static final String TAPI_CONTENT_AUTHORITY = "xeonleon.xhizuku.tapi";
+
+    /**
+     * Optional extra in the permission confirmation reply Bundle carrying the epoch
+     * millis when a temporary grant/deny expires. 0 or absent means permanent
+     * (subject to the usual allowed/onetime semantics).
+     */
+    public static final String REQUEST_PERMISSION_REPLY_EXPIRY = "xeonleon.xhizuku.request-permission-reply-expiry";
 }

@@ -142,6 +142,8 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
             sendBinderToClient();
             sendBinderToManager();
         });
+
+        scheduleExpirySweep();
     }
 
     @Override
@@ -241,6 +243,10 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
 
         LOGGER.d("attachApplication: %s %d %d", requestPackageName, callingUid, callingPid);
 
+        // A stored temporary grant may have expired while the server was away.
+        // Fix the live record before reporting permission state to the client.
+        clearExpiredGrantIfNeeded(callingUid);
+
         int replyServerVersion = ShizukuApiConstants.SERVER_VERSION;
         if (apiVersion == -1) {
             replyServerVersion = 12;
@@ -310,9 +316,15 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
 
         boolean allowed = data.getBoolean(REQUEST_PERMISSION_REPLY_ALLOWED);
         boolean onetime = data.getBoolean(REQUEST_PERMISSION_REPLY_IS_ONETIME);
+        long expiry = data.getLong(ServerConstants.REQUEST_PERMISSION_REPLY_EXPIRY, 0L);
+        if (expiry != 0L && expiry <= System.currentTimeMillis()) {
+            // Already expired: fall back to one-shot semantics.
+            expiry = 0L;
+            onetime = true;
+        }
 
-        LOGGER.i("dispatchPermissionConfirmationResult: uid=%d, pid=%d, requestCode=%d, allowed=%s, onetime=%s",
-                requestUid, requestPid, requestCode, Boolean.toString(allowed), Boolean.toString(onetime));
+        LOGGER.i("dispatchPermissionConfirmationResult: uid=%d, pid=%d, requestCode=%d, allowed=%s, onetime=%s, expiry=%d",
+                requestUid, requestPid, requestCode, Boolean.toString(allowed), Boolean.toString(onetime), expiry);
 
         List<ClientRecord> records = clientManager.findClients(requestUid);
         List<String> packages = new ArrayList<>();
@@ -330,6 +342,7 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
 
         if (!onetime) {
             configManager.update(requestUid, packages, ConfigManager.MASK_PERMISSION, allowed ? ConfigManager.FLAG_ALLOWED : ConfigManager.FLAG_DENIED);
+            configManager.setExpiry(requestUid, expiry);
         }
 
         if (!onetime && allowed) {
@@ -351,6 +364,7 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
     }
 
     private int getFlagsForUidInternal(int uid, int mask, boolean allowRuntimePermission) {
+        clearExpiredGrantIfNeeded(uid);
         ShizukuConfig.PackageEntry entry = (ShizukuConfig.PackageEntry) configManager.find(uid);
         if (entry != null) {
             return entry.flags & mask;
@@ -433,6 +447,77 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
         }
 
         configManager.update(uid, PackageManagerApis.getPackagesForUidNoThrow(uid), mask, value);
+        // A manual change replaces any temporary grant.
+        configManager.setExpiry(uid, 0);
+    }
+
+    private boolean isGrantExpired(int uid) {
+        ShizukuConfig.PackageEntry entry = configManager.find(uid);
+        return entry != null && entry.expiry != 0L && entry.expiry <= System.currentTimeMillis();
+    }
+
+    /**
+     * Drops an expired temporary grant/deny: clears the stored flags, fixes live
+     * client records and revokes the Android runtime permission when one was granted,
+     * mirroring a manual revoke.
+     *
+     * @return true if an expired entry was cleared
+     */
+    private boolean clearExpiredGrantIfNeeded(int uid) {
+        ShizukuConfig.PackageEntry entry = configManager.find(uid);
+        if (entry == null || entry.expiry == 0L || entry.expiry > System.currentTimeMillis()) {
+            return false;
+        }
+        boolean wasAllowed = (entry.flags & ConfigManager.FLAG_ALLOWED) != 0;
+        List<ClientRecord> records = clientManager.findClients(uid);
+        List<String> packages = PackageManagerApis.getPackagesForUidNoThrow(uid);
+        for (ClientRecord record : records) {
+            record.allowed = false;
+        }
+        configManager.update(uid, packages, ConfigManager.MASK_PERMISSION, 0);
+        configManager.setExpiry(uid, 0);
+        int userId = UserHandleCompat.getUserId(uid);
+        if (wasAllowed) {
+            for (ClientRecord record : records) {
+                ActivityManagerApis.forceStopPackageNoThrow(record.packageName, UserHandleCompat.getUserId(record.uid));
+                onPermissionRevoked(record.packageName);
+            }
+            for (String packageName : packages) {
+                PackageInfo pi = Android17Compat.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS, userId);
+                if (pi == null || pi.requestedPermissions == null || !ArraysKt.contains(pi.requestedPermissions, PERMISSION)) {
+                    continue;
+                }
+                try {
+                    Android17Compat.revokeRuntimePermission(packageName, PERMISSION, userId);
+                } catch (Throwable tr) {
+                    LOGGER.w(tr, "revokeRuntimePermission on expiry");
+                }
+            }
+        }
+        LOGGER.i("cleared expired temporary grant for uid=%d (wasAllowed=%s)", uid, Boolean.toString(wasAllowed));
+        return true;
+    }
+
+    private Runnable expirySweepRunnable;
+
+    private void scheduleExpirySweep() {
+        if (expirySweepRunnable != null) {
+            mainHandler.removeCallbacks(expirySweepRunnable);
+        }
+        expirySweepRunnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    for (ShizukuConfig.PackageEntry entry : configManager.snapshotEntries()) {
+                        clearExpiredGrantIfNeeded(entry.uid);
+                    }
+                } catch (Throwable tr) {
+                    LOGGER.w(tr, "expiry sweep");
+                }
+                mainHandler.postDelayed(expirySweepRunnable, 30000L);
+            }
+        };
+        mainHandler.postDelayed(expirySweepRunnable, 30000L);
     }
 
     private void onPermissionRevoked(String packageName) {

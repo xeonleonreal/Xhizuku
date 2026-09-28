@@ -23,6 +23,7 @@ Upstream project reference: <https://github.com/RikkaApps/Shizuku>
 - Theme color overide in Xhizuku
 - XStatus: CPU, GPU, memory and swap usage in an ongoing notification
 - Expandable card descriptions on the status page (tap the arrow to show or hide long explanations)
+- ..and many more! [See full additions](docs/full-addons)
 
 ## Documentation
 

@@ -188,6 +188,10 @@
             android:exported="false"
             android:label="@string/extras_shizutest_title" />
 
+        <activity
+            android:name=".monitor.ServerLogActivity"
+            android:exported="false"
+            android:label="@string/log_title" />
         <receiver
             android:name=".receiver.BootCompleteReceiver"
             android:directBootAware="true"

@@ -1,31 +1,20 @@
 package moe.shizuku.manager.receiver
 
-import android.Manifest.permission.WRITE_SECURE_SETTINGS
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
-import android.provider.Settings
 import android.util.Log
-import androidx.annotation.RequiresApi
-import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import moe.shizuku.manager.AppConstants
 import moe.shizuku.manager.ShizukuSettings
 import moe.shizuku.manager.ShizukuSettings.LaunchMethod
-import moe.shizuku.manager.adb.AdbClient
-import moe.shizuku.manager.adb.AdbKey
-import moe.shizuku.manager.adb.AdbMdns
-import moe.shizuku.manager.adb.PreferenceAdbKeyStore
 import moe.shizuku.manager.monitor.ServerMonitorService
-import moe.shizuku.manager.starter.Starter
+import moe.shizuku.manager.starter.ServerRestarter
 import moe.shizuku.manager.utils.UserHandleCompat
 import rikka.shizuku.Shizuku
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 class BootCompleteReceiver : BroadcastReceiver() {
 
@@ -40,54 +29,21 @@ class BootCompleteReceiver : BroadcastReceiver() {
         if (UserHandleCompat.myUserId() > 0 || Shizuku.pingBinder()) return
 
         if (ShizukuSettings.getLastLaunchMode() == LaunchMethod.ROOT) {
-            rootStart(context)
+            CoroutineScope(Dispatchers.IO).launch {
+                ServerRestarter.restartRoot()
+            }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-            && context.checkSelfPermission(WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED
             && ShizukuSettings.getLastLaunchMode() == LaunchMethod.ADB) {
-            adbStart(context)
+            val pending = goAsync()
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    ServerRestarter.restartAdb(context)
+                } finally {
+                    pending.finish()
+                }
+            }
         } else {
             Log.w(AppConstants.TAG, "No support start on boot")
-        }
-    }
-
-    private fun rootStart(context: Context) {
-        if (!Shell.getShell().isRoot) {
-
-            Shell.getCachedShell()?.close()
-            return
-        }
-
-        Shell.cmd(Starter.internalCommand).exec()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun adbStart(context: Context) {
-        val cr = context.contentResolver
-        Settings.Global.putInt(cr, "adb_wifi_enabled", 1)
-        Settings.Global.putInt(cr, Settings.Global.ADB_ENABLED, 1)
-        Settings.Global.putLong(cr, "adb_allowed_connection_time", 0L)
-        val pending = goAsync()
-        CoroutineScope(Dispatchers.IO).launch {
-            val latch = CountDownLatch(1)
-            val adbMdns = AdbMdns(context, AdbMdns.TLS_CONNECT) { (host, port) ->
-                if (port <= 0) return@AdbMdns
-                try {
-                    val keystore = PreferenceAdbKeyStore(ShizukuSettings.getPreferences())
-                    val key = AdbKey(keystore, "shizuku")
-                    val client = AdbClient(host, port, key)
-                    client.connect()
-                    client.shellCommand(Starter.internalCommand, null)
-                    client.close()
-                } catch (_: Exception) {
-                }
-                latch.countDown()
-            }
-            if (Settings.Global.getInt(cr, "adb_wifi_enabled", 0) == 1) {
-                adbMdns.start()
-                latch.await(3, TimeUnit.SECONDS)
-                adbMdns.stop()
-            }
-            pending.finish()
         }
     }
 }

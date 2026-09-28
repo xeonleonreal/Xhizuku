@@ -237,6 +237,16 @@ With %1$s, in any terminal app, you can connect to and interact with the shell r
     <string name="permission_warning_template"><![CDATA[Allow <b>%1$s</b> to %2$s?]]></string>
     <string name="grant_dialog_button_allow_always">Allow all the time</string>
     <string name="grant_dialog_button_deny">"Deny"</string>
+    <string name="grant_dialog_allow_once">Allow once</string>
+    <string name="grant_dialog_allow_temp">Allow for…</string>
+    <string name="grant_dialog_deny_temp">Deny for…</string>
+    <string name="grant_dialog_duration_title">Duration</string>
+    <string name="grant_dialog_duration_15m">15 minutes</string>
+    <string name="grant_dialog_duration_30m">30 minutes</string>
+    <string name="grant_dialog_duration_1h">1 hour</string>
+    <string name="grant_dialog_duration_8h">8 hours</string>
+    <string name="grant_dialog_duration_24h">24 hours</string>
+    <string name="grant_dialog_confirm">Allow</string>
 
     <!-- Starter -->
     <string name="starter">Starter</string>
@@ -370,6 +380,23 @@ With %1$s, in any terminal app, you can connect to and interact with the shell r
     <string name="monitor_died_text">The Xhizuku server process is no longer running</string>
     <string name="monitor_stop_server">Stop server</string>
     <string name="monitor_needs_permission">Please allow notifications to enable this feature</string>
+
+    <!-- App updates -->
+    <string name="notification_channel_app_updates">App updates</string>
+    <string name="update_available_title">Xhizuku update available</string>
+    <string name="update_available_text">%1$s is available — tap to view</string>
+    <string name="update_open">View release</string>
+
+    <!-- Extras -->
+    <string name="extras_server_info_title">Server info</string>
+    <string name="monitor_auto_restart_title">Auto-restart server</string>
+    <string name="monitor_auto_restart_summary">Start the server again if it dies unexpectedly</string>
+    <string name="log_title">Server log</string>
+    <string name="log_summary">View the Xhizuku server log</string>
+    <string name="log_not_running">Start the server first</string>
+    <string name="log_no_permission">Xhizuku has not granted access yet. Request it below, then refresh.</string>
+    <string name="log_authorize">Request access</string>
+    <string name="log_empty">No Shizuku lines in the log</string>
 
     <!-- Onboarding -->
     <string name="onboarding_title">Welcome to Xhizuku</string>

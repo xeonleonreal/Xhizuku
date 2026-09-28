@@ -1,0 +1,6 @@
+Xhizuku 2.0.0 - timed app permissions, auto-restart and live server info.
+
+- Permission dialog: allow always, allow once, allow/deny for a chosen duration
+- Auto-restart the server if it dies unexpectedly
+- Server info in Extras: uptime and ADB port
+- Server log viewer and in-app update notifications

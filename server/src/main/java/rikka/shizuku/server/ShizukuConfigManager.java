@@ -253,6 +253,26 @@ public class ShizukuConfigManager extends ConfigManager {
         }
     }
 
+    public void setExpiry(int uid, long expiry) {
+        synchronized (this) {
+            ShizukuConfig.PackageEntry entry = findLocked(uid);
+            if (entry == null) {
+                return;
+            }
+            if (entry.expiry == expiry) {
+                return;
+            }
+            entry.expiry = expiry;
+            scheduleWriteLocked();
+        }
+    }
+
+    public List<ShizukuConfig.PackageEntry> snapshotEntries() {
+        synchronized (this) {
+            return new ArrayList<>(config.packages);
+        }
+    }
+
     public boolean getNightDogEnabled() {
         synchronized (this) {
             return config.nightDogEnabled;

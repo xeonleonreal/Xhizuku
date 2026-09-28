@@ -90,6 +90,14 @@ object XStatusCollector {
         return runViaShizuku(cmd) ?: runLocal(cmd)
     }
 
+    /**
+     * Runs a shell command through the Xhizuku server when available,
+     * falling back to a local shell. Returns trimmed stdout or null.
+     */
+    fun runCommand(cmd: String): String? {
+        return runShell(cmd)?.trim()?.ifBlank { null }
+    }
+
     private fun readFirstLine(path: String): String? {
         try {
             val file = File(path)

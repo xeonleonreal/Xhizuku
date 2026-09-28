@@ -103,6 +103,7 @@ class ServerMonitorService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP_SERVER) {
             try {
+                MonitorSettings.noteManualStop()
                 Shizuku.exit()
             } catch (_: Throwable) {
             }
@@ -279,12 +280,29 @@ class ServerMonitorService : Service() {
     private fun onServerStateChanged(running: Boolean) {
         val previous = lastKnownRunning
         lastKnownRunning = running
+        if (running) {
+            MonitorSettings.setServerStartedAt(System.currentTimeMillis())
+        } else {
+            MonitorSettings.setServerStartedAt(0L)
+        }
         updateStatusNotification()
         if (previous == true && !running) {
             postDiedAlert()
+            maybeAutoRestart()
         }
         if (running) {
             notificationManager().cancel(ID_DIED_ALERT)
+        }
+    }
+
+    private fun maybeAutoRestart() {
+        if (!MonitorSettings.isAutoRestartEnabled()) return
+        if (MonitorSettings.isManualStopRecent()) return
+        scope.launch {
+            try {
+                moe.shizuku.manager.starter.ServerRestarter.restart(this@ServerMonitorService)
+            } catch (_: Throwable) {
+            }
         }
     }
 

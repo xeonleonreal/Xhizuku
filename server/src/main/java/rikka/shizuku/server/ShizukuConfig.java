@@ -31,10 +31,18 @@ public class ShizukuConfig {
         @SerializedName("packages")
         public List<String> packages;
 
+        /**
+         * Epoch millis when a temporary grant/deny expires. 0 means no expiry.
+         * Absent in configs written by older versions (defaults to 0).
+         */
+        @SerializedName("expiry")
+        public long expiry;
+
         public PackageEntry(int uid, int flags) {
             this.uid = uid;
             this.flags = flags;
             this.packages = new ArrayList<>();
+            this.expiry = 0L;
         }
 
         @Override
