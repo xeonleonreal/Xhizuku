@@ -113,3 +113,13 @@ All code is licensed under Apache 2.0.
 - [**Razgame**](https://github.com/RazGame/Shizuku) for [app list fix](https://github.com/xeonleonreal/Xhizuku/commit/6ea7e74984f860398760f5111a15083ea004c842)
 - [**kerneldroid**](https://github.com/kerneldroid) for [Nightzuku](https://github.com/kerneldroid/Nightzuku)
 
+## Star History
+
+<a href="https://www.star-history.com/?repos=xeonleonreal%2Fadbq%2Cxeonleonreal%2Fxhizuku&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=xeonleonreal/adbq%2Cxeonleonreal/xhizuku&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=xeonleonreal/adbq%2Cxeonleonreal/xhizuku&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=xeonleonreal/adbq%2Cxeonleonreal/xhizuku&type=date&legend=top-left" />
+ </picture>
+</a>
+
