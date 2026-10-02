@@ -20,3 +20,6 @@ This is list of additions that will be updated every major update
 - Server info, shows information about the server. Useful for reporting bugs
 - Auto-restart. When the server dies it will try to auto start again.
 - Better auth system! Now you can deny/deny for set time/allow for set time/allow once/allow
+#### Update 3.0.0:
+- Battery exemption - Some phones kills the service without any warning and xhizuku dies. This should help keeping server alive
+- Console tab - You can run shell commands in Xhizuku!
