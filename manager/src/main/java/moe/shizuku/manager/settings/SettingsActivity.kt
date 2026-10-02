@@ -3,6 +3,7 @@ package moe.shizuku.manager.settings
 import android.content.ComponentName
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.text.TextUtils
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -59,6 +60,12 @@ import java.util.Locale
 class SettingsActivity : AppActivity() {
 
     private var pendingMonitorAction: (() -> Unit)? = null
+    private var settingsTick by androidx.compose.runtime.mutableStateOf(0)
+
+    override fun onResume() {
+        super.onResume()
+        settingsTick++
+    }
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -71,8 +78,33 @@ class SettingsActivity : AppActivity() {
         pendingMonitorAction = null
     }
 
-    private fun runWithNotificationPermission(action: () -> Unit) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+    private fun isBatteryExemptionGranted(): Boolean {
+        val powerManager = getSystemService(PowerManager::class.java) ?: return true
+        return powerManager.isIgnoringBatteryOptimizations(packageName)
+    }
+
+    private fun requestBatteryExemption() {
+        try {
+            startActivity(
+                android.content.Intent(
+                    android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                    android.net.Uri.parse("package:$packageName")
+                )
+            )
+        } catch (_: Throwable) {
+            try {
+                startActivity(
+                    android.content.Intent(
+                        android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        android.net.Uri.parse("package:$packageName")
+                    )
+                )
+            } catch (_: Throwable) {
+            }
+        }
+    }
+
+    private fun runWithNotificationPermission(action: () -> Unit) {        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
             checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) ==
                 android.content.pm.PackageManager.PERMISSION_GRANTED
         ) {
@@ -148,6 +180,10 @@ class SettingsActivity : AppActivity() {
                 stringResource(rikka.core.R.string.follow_system)
             }
             val contributors = htmlToPlainText(getString(R.string.translation_contributors))
+
+            val batteryExempted = remember(settingsTick) {
+                isBatteryExemptionGranted()
+            }
 
             LaunchedEffect(recreateTick) {
                 if (recreateTick > 0) {
@@ -295,6 +331,19 @@ class SettingsActivity : AppActivity() {
                                         packageManager.setComponentEnabled(componentName, enabled)
                                         startOnBoot = packageManager.isComponentEnabled(componentName)
                                     }
+                                )
+                                GroupDivider()
+                                SettingsRow(
+                                    icon = R.drawable.ic_warning_24,
+                                    title = stringResource(R.string.battery_title),
+                                    summary = stringResource(
+                                        if (batteryExempted) {
+                                            R.string.battery_state_allowed
+                                        } else {
+                                            R.string.battery_state_missing
+                                        }
+                                    ),
+                                    onClick = { requestBatteryExemption() }
                                 )
                             }
                         }

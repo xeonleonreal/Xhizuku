@@ -74,6 +74,8 @@ internal data class LocalNetworkPermissionState(
         get() = permission?.substringAfterLast('.') ?: "none"
 }
 
+internal data class BatteryExemptionState(val granted: Boolean)
+
 internal data class HomeButtonSpec(
     @param:StringRes val label: Int,
     @param:DrawableRes val icon: Int,
@@ -106,7 +108,9 @@ internal fun HomeScreen(
     onLearnMore: () -> Unit,
     onCopyDiagnostics: (String) -> Unit,
     onRequestLocalNetworkPermission: () -> Unit,
-    onOpenTab: (MainTab) -> Unit = {}
+    onOpenTab: (MainTab) -> Unit = {},
+    batteryExemptionState: BatteryExemptionState = BatteryExemptionState(true),
+    onRequestBatteryExemption: () -> Unit = {}
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val isWatch = androidx.compose.runtime.remember(context) { moe.shizuku.manager.utils.EnvironmentUtils.isWatch(context) }
@@ -189,7 +193,9 @@ internal fun HomeScreen(
             onLearnMore = onLearnMore,
             onCopyDiagnostics = onCopyDiagnostics,
             onRequestLocalNetworkPermission = onRequestLocalNetworkPermission,
-            onOpenTab = onOpenTab
+            onOpenTab = onOpenTab,
+            batteryExemptionState = batteryExemptionState,
+            onRequestBatteryExemption = onRequestBatteryExemption
         )
     }
 }
@@ -217,7 +223,9 @@ internal fun HomeScreen(
     onLearnMore: () -> Unit,
     onCopyDiagnostics: (String) -> Unit,
     onRequestLocalNetworkPermission: () -> Unit,
-    onOpenTab: (MainTab) -> Unit
+    onOpenTab: (MainTab) -> Unit,
+    batteryExemptionState: BatteryExemptionState,
+    onRequestBatteryExemption: () -> Unit
 ) {
     val context = LocalContext.current
     val status = serviceResource?.data ?: ServiceStatus()
@@ -374,6 +382,27 @@ internal fun HomeScreen(
                         localNetworkPermissionState = localNetworkPermissionState,
                         onRequestLocalNetworkPermission = onRequestLocalNetworkPermission
                     )
+                }
+            }
+
+            if (!batteryExemptionState.granted) {
+                item {
+                    HomeCard(
+                        icon = R.drawable.ic_warning_24,
+                        title = stringResource(R.string.battery_title),
+                        body = stringResource(R.string.battery_body)
+                    ) {
+                        HomeButtons(
+                            listOf(
+                                HomeButtonSpec(
+                                    label = R.string.battery_allow,
+                                    icon = R.drawable.ic_settings_outline_24dp,
+                                    primary = true,
+                                    onClick = onRequestBatteryExemption
+                                )
+                            )
+                        )
+                    }
                 }
             }
 

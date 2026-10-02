@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -148,7 +149,8 @@ class OnboardingActivity : AppActivity() {
                             }
                             1 -> item { MigrateStep() }
                             2 -> item { StartMethodStep() }
-                            3 -> item { NotificationsStep() }
+                            3 -> item { BatteryStep() }
+                            4 -> item { NotificationsStep() }
                             else -> item { DoneStep() }
                         }
                     }
@@ -268,6 +270,47 @@ class OnboardingActivity : AppActivity() {
         }
     }
 
+    private fun isBatteryExemptionGranted(): Boolean {
+        val powerManager = getSystemService(PowerManager::class.java) ?: return true
+        return powerManager.isIgnoringBatteryOptimizations(packageName)
+    }
+
+    private fun requestBatteryExemption() {
+        try {
+            startActivity(
+                Intent(
+                    Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                    Uri.parse("package:$packageName")
+                )
+            )
+        } catch (_: Throwable) {
+            try {
+                startActivity(
+                    Intent(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:$packageName")
+                    )
+                )
+            } catch (_: Throwable) {
+            }
+        }
+    }
+
+    @androidx.compose.runtime.Composable
+    private fun BatteryStep() {
+        ExpressiveCard(
+            icon = R.drawable.ic_warning_24,
+            title = stringResource(R.string.battery_title),
+            body = stringResource(R.string.battery_body)
+        ) {
+            FilledTonalButton(
+                onClick = { requestBatteryExemption() }
+            ) {
+                Text(text = stringResource(R.string.battery_allow))
+            }
+        }
+    }
+
     @androidx.compose.runtime.Composable
     private fun NotificationsStep() {
         ExpressiveCard(
@@ -301,7 +344,7 @@ class OnboardingActivity : AppActivity() {
     }
 
     companion object {
-        private const val LAST_PAGE = 4
+        private const val LAST_PAGE = 5
 
         fun shouldShow(context: Context): Boolean {
             if (EnvironmentUtils.isWatch(context) || EnvironmentUtils.isTV(context)) return false

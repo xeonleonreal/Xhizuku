@@ -5,8 +5,11 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.view.Menu
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -162,6 +165,10 @@ abstract class HomeActivity : AppActivity() {
                         onRequestLocalNetworkPermission = {
                             requestLocalNetworkPermission { permissionRefreshTick.intValue++ }
                         },
+                        batteryExemptionState = remember(permissionRefreshTick.intValue) {
+                            BatteryExemptionState(isBatteryExemptionGranted())
+                        },
+                        onRequestBatteryExemption = { requestBatteryExemption() },
                         onOpenTab = { openMainTab(it) }
                     )
 
@@ -344,6 +351,32 @@ abstract class HomeActivity : AppActivity() {
 
         pendingLocalNetworkAction = onGranted
         localNetworkPermissionLauncher.launch(state.permission!!)
+    }
+
+    private fun isBatteryExemptionGranted(): Boolean {
+        val powerManager = getSystemService(PowerManager::class.java) ?: return true
+        return powerManager.isIgnoringBatteryOptimizations(packageName)
+    }
+
+    private fun requestBatteryExemption() {
+        try {
+            startActivity(
+                Intent(
+                    Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                    Uri.parse("package:$packageName")
+                )
+            )
+        } catch (_: Throwable) {
+            try {
+                startActivity(
+                    Intent(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:$packageName")
+                    )
+                )
+            } catch (_: Throwable) {
+            }
+        }
     }
 
     private fun buildLocalNetworkPermissionState(): LocalNetworkPermissionState {

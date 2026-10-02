@@ -33,7 +33,24 @@ object XStatusCollector {
 
     private const val SHELL_TIMEOUT_SECONDS = 5L
 
-    private fun runViaShizuku(cmd: String): String? {
+    data class ExecResult(
+        val stdout: String,
+        val stderr: String,
+        val exitCode: Int,
+        /** True when the command ran through the Xhizuku server. */
+        val elevated: Boolean
+    )
+
+    /**
+     * Runs a shell command through the Xhizuku server when available,
+     * falling back to a local shell. Captures stdout, stderr and exit code.
+     */
+    fun exec(cmd: String): ExecResult {
+        runViaShizukuFull(cmd)?.let { return it.copy(elevated = true) }
+        return runLocalFull(cmd).copy(elevated = false)
+    }
+
+    private fun runViaShizukuFull(cmd: String): ExecResult? {
         return try {
             val binder = Shizuku.getBinder() ?: return null
             val service = IShizukuService.Stub.asInterface(binder)
@@ -43,33 +60,74 @@ object XStatusCollector {
             } catch (_: Throwable) {
             }
             var stdout = ""
-            val reader = Thread {
+            var stderr = ""
+            val outReader = Thread {
                 try {
                     stdout = ParcelFileDescriptor.AutoCloseInputStream(remote.inputStream)
-                        .bufferedReader()
-                        .readText()
+                        .bufferedReader().readText()
                 } catch (_: Throwable) {
                 }
             }
-            reader.start()
+            val errReader = Thread {
+                try {
+                    stderr = ParcelFileDescriptor.AutoCloseInputStream(remote.errorStream)
+                        .bufferedReader().readText()
+                } catch (_: Throwable) {
+                }
+            }
+            outReader.start()
+            errReader.start()
             val finished = try {
                 remote.waitForTimeout(SHELL_TIMEOUT_SECONDS, TimeUnit.SECONDS.name)
             } catch (_: Throwable) {
                 false
             }
-            if (!finished) {
+            val code = if (finished) {
+                try {
+                    remote.exitValue()
+                } catch (_: Throwable) {
+                    -1
+                }
+            } else {
                 try {
                     remote.destroy()
                 } catch (_: Throwable) {
                 }
+                124
             }
-            reader.join(1000)
-            stdout.ifBlank { null }
+            outReader.join(1000)
+            errReader.join(1000)
+            ExecResult(stdout, stderr, code, elevated = false)
         } catch (_: Throwable) {
             null
         }
     }
 
+    private fun runLocalFull(cmd: String): ExecResult {
+        return try {
+            val process = ProcessBuilder("sh", "-c", cmd)
+                .redirectErrorStream(false)
+                .start()
+            val finished = process.waitFor(SHELL_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            if (!finished) {
+                process.destroyForcibly()
+                return ExecResult("", "timed out", 124, elevated = false)
+            }
+            val stdout = try {
+                process.inputStream.bufferedReader().readText()
+            } catch (_: Throwable) {
+                ""
+            }
+            val stderr = try {
+                process.errorStream.bufferedReader().readText()
+            } catch (_: Throwable) {
+                ""
+            }
+            ExecResult(stdout, stderr, process.exitValue(), elevated = false)
+        } catch (e: Throwable) {
+            ExecResult("", e.message ?: "failed", -1, elevated = false)
+        }
+    }
     private fun runLocal(cmd: String): String? {
         return try {
             val process = ProcessBuilder("sh", "-c", cmd)
@@ -87,7 +145,7 @@ object XStatusCollector {
     }
 
     private fun runShell(cmd: String): String? {
-        return runViaShizuku(cmd) ?: runLocal(cmd)
+        return runViaShizukuFull(cmd)?.stdout?.ifBlank { null } ?: runLocal(cmd)
     }
 
     /**
@@ -107,7 +165,7 @@ object XStatusCollector {
         } catch (_: Throwable) {
         }
         // Elevated shell can read nodes the app cannot.
-        return runViaShizuku("cat '$path'")?.lineSequence()?.firstOrNull()?.trim()
+        return runCommand("cat '$path'")?.lineSequence()?.firstOrNull()?.trim()
     }
 
     @Synchronized

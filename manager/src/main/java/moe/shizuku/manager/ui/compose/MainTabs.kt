@@ -13,8 +13,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.Terminal
 import moe.shizuku.manager.MainActivity
 import moe.shizuku.manager.R
+import moe.shizuku.manager.console.ConsoleActivity
 import moe.shizuku.manager.extras.ExtrasActivity
 import moe.shizuku.manager.settings.SettingsActivity
 
@@ -28,6 +30,7 @@ enum class MainTab(
 ) {
     STATUS(R.string.tab_status, Icons.Rounded.Shield),
     EXTRAS(R.string.tab_extras, Icons.Rounded.Apps),
+    CONSOLE(R.string.tab_console, Icons.Rounded.Terminal),
     SETTINGS(R.string.tab_settings, Icons.Rounded.Settings)
 }
 
@@ -54,6 +57,7 @@ fun Activity.openMainTab(tab: MainTab) {
     val target = when (tab) {
         MainTab.STATUS -> MainActivity::class.java
         MainTab.EXTRAS -> ExtrasActivity::class.java
+        MainTab.CONSOLE -> ConsoleActivity::class.java
         MainTab.SETTINGS -> SettingsActivity::class.java
     }
     if (this::class.java == target) return

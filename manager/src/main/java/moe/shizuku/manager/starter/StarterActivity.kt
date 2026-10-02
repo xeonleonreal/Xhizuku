@@ -13,12 +13,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import moe.shizuku.manager.AppConstants.EXTRA
 import moe.shizuku.manager.R
 import moe.shizuku.manager.ShizukuSettings
@@ -45,7 +48,9 @@ private class NotRootedException : Exception()
 class StarterActivity : AppActivity() {
 
     private var waitingForService = false
+    private var serverUp = false
     private var binderReceivedListener: Shizuku.OnBinderReceivedListener? = null
+    private var pollJob: kotlinx.coroutines.Job? = null
 
     private val viewModel by viewModels {
         ViewModel(
@@ -58,10 +63,28 @@ class StarterActivity : AppActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        pollJob?.cancel()
+        pollJob = null
         binderReceivedListener?.let {
             Shizuku.removeBinderReceivedListener(it)
             binderReceivedListener = null
         }
+    }
+
+    private fun onServerUp() {
+        if (isFinishing || serverUp) return
+        serverUp = true
+        pollJob?.cancel()
+        pollJob = null
+        binderReceivedListener?.let {
+            Shizuku.removeBinderReceivedListener(it)
+            binderReceivedListener = null
+        }
+        waitingForService = true
+        viewModel.appendOutput("Service started, this window will be automatically closed in 3 seconds")
+        window?.decorView?.postDelayed({
+            if (!isFinishing) finish()
+        }, 3000)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,27 +107,42 @@ class StarterActivity : AppActivity() {
         // The starter process stays alive (it supervises the server and restarts
         // it on crashes), so its output never ends with an exit line. Watch the
         // binder instead: when the server is up it delivers a binder, whether it
-        // was just started or was already running.
+        // was just started or was already running. A polling fallback covers the
+        // case where the listener never fires.
         val binderListener = object : Shizuku.OnBinderReceivedListener {
             override fun onBinderReceived() {
-                Shizuku.removeBinderReceivedListener(this)
-                binderReceivedListener = null
-                runOnUiThread {
-                    if (isFinishing) return@runOnUiThread
-                    waitingForService = true
-                    viewModel.appendOutput("Service started, this window will be automatically closed in 3 seconds")
-                    window?.decorView?.postDelayed({
-                        if (!isFinishing) finish()
-                    }, 3000)
-                }
+                runOnUiThread { onServerUp() }
             }
         }
         binderReceivedListener = binderListener
         Shizuku.addBinderReceivedListenerSticky(binderListener)
 
+        pollJob = lifecycleScope.launch {
+            repeat(45) {
+                delay(2000)
+                if (isFinishing) return@launch
+                val up = try {
+                    withContext(Dispatchers.IO) { Shizuku.pingBinder() }
+                } catch (_: Throwable) {
+                    false
+                }
+                if (up) {
+                    onServerUp()
+                    return@launch
+                }
+            }
+            if (!isFinishing && !serverUp) {
+                viewModel.appendOutput("")
+                viewModel.appendOutput("Server did not respond in time. Close this window and check Status.")
+            }
+        }
+
         viewModel.output.observe(this) {
             val output = it.data.orEmpty().trim()
-            if (!waitingForService && output.endsWith("info: shizuku_starter exit with 0")) {
+            if (!waitingForService &&
+                (output.contains("info: shizuku_server pid is") ||
+                    output.endsWith("info: shizuku_starter exit with 0"))
+            ) {
                 waitingForService = true
                 viewModel.appendOutput("")
                 viewModel.appendOutput("Waiting for service...")

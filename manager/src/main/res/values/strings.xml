@@ -348,6 +348,7 @@ With %1$s, in any terminal app, you can connect to and interact with the shell r
     <string name="tab_status">Status</string>
     <string name="tab_extras">Extras</string>
     <string name="tab_settings">Settings</string>
+    <string name="tab_console">Console</string>
     <string name="extras_title">Extras</string>
     <string name="extras_shizutest_title">ShizuTest</string>
     <string name="extras_shizutest_summary">Run integration checks against Xhizuku</string>
@@ -396,6 +397,20 @@ With %1$s, in any terminal app, you can connect to and interact with the shell r
     <string name="log_not_running">Start the server first</string>
     <string name="log_no_permission">Xhizuku has not granted access yet. Request it below, then refresh.</string>
     <string name="log_authorize">Request access</string>
+
+    <!-- Console -->
+    <string name="console_hint">Enter shell command</string>
+    <string name="console_run">Run</string>
+    <string name="console_clear">Clear</string>
+    <string name="console_shell_elevated">Shell — elevated shell</string>
+    <string name="console_shell_local">Local shell — server stopped</string>
+
+    <!-- Battery optimization -->
+    <string name="battery_title">Allow background operation</string>
+    <string name="battery_body">The system may kill Xhizuku to save power. Disable battery optimization so the server keeps running.</string>
+    <string name="battery_allow">Allow</string>
+    <string name="battery_state_allowed">Unrestricted</string>
+    <string name="battery_state_missing">Restricted — tap to allow</string>
     <string name="log_empty">No Shizuku lines in the log</string>
 
     <!-- Onboarding -->
