@@ -11,12 +11,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.rounded.Apps
+import androidx.compose.material.icons.rounded.BugReport
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Terminal
 import moe.shizuku.manager.MainActivity
 import moe.shizuku.manager.R
 import moe.shizuku.manager.console.ConsoleActivity
+import moe.shizuku.manager.diagnostics.DebugMenuActivity
 import moe.shizuku.manager.extras.ExtrasActivity
 import moe.shizuku.manager.settings.SettingsActivity
 
@@ -31,7 +33,8 @@ enum class MainTab(
     STATUS(R.string.tab_status, Icons.Rounded.Shield),
     EXTRAS(R.string.tab_extras, Icons.Rounded.Apps),
     CONSOLE(R.string.tab_console, Icons.Rounded.Terminal),
-    SETTINGS(R.string.tab_settings, Icons.Rounded.Settings)
+    SETTINGS(R.string.tab_settings, Icons.Rounded.Settings),
+    DEBUG(R.string.tab_debug, Icons.Rounded.BugReport)
 }
 
 @Composable
@@ -59,6 +62,7 @@ fun Activity.openMainTab(tab: MainTab) {
         MainTab.EXTRAS -> ExtrasActivity::class.java
         MainTab.CONSOLE -> ConsoleActivity::class.java
         MainTab.SETTINGS -> SettingsActivity::class.java
+        MainTab.DEBUG -> DebugMenuActivity::class.java
     }
     if (this::class.java == target) return
     val intent = Intent(this, target)

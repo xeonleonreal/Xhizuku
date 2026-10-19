@@ -10,6 +10,27 @@ import moe.shizuku.manager.starter.Starter
 
 class ShizukuConnectorProvider : ContentProvider() {
 
+    companion object {
+        private const val ACTIVATOR_MAX = 100
+        private val activatorLog = ArrayList<String>()
+
+        fun getActivatorLog(): List<String> {
+            synchronized(activatorLog) {
+                return ArrayList(activatorLog).reversed()
+            }
+        }
+
+        private fun logActivator(packageName: String?) {
+            val entry = System.currentTimeMillis().toString() + "|" + (packageName ?: "?")
+            synchronized(activatorLog) {
+                activatorLog.add(entry)
+                while (activatorLog.size > ACTIVATOR_MAX) {
+                    activatorLog.removeAt(0)
+                }
+            }
+        }
+    }
+
     override fun onCreate(): Boolean {
         context?.let {
             moe.shizuku.manager.ShizukuSettings.initialize(it)
@@ -26,6 +47,11 @@ class ShizukuConnectorProvider : ContentProvider() {
     ): Cursor? {
         if (!ModuleSettings.isConnectorEnabled()) {
             return null
+        }
+
+        try {
+            logActivator(callingPackage)
+        } catch (_: Throwable) {
         }
 
         val cursor = MatrixCursor(arrayOf("command"))

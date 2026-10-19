@@ -29,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import moe.shizuku.manager.R
 import moe.shizuku.manager.app.AppActivity
+import moe.shizuku.manager.diagnostics.AuditActivity
 import moe.shizuku.manager.module.ModulesActivity
 import moe.shizuku.manager.monitor.MonitorSettings
 import moe.shizuku.manager.monitor.ServerLogActivity
@@ -174,6 +175,16 @@ class ExtrasActivity : AppActivity() {
                                 body = stringResource(R.string.extras_shizutest_summary),
                                 onClick = {
                                     startActivity(Intent(this@ExtrasActivity, ShizuTestActivity::class.java))
+                                }
+                            )
+                        }
+                        item {
+                            ExpressiveCard(
+                                icon = R.drawable.ic_outline_info_24,
+                                title = stringResource(R.string.audit_title),
+                                body = stringResource(R.string.audit_usage_title),
+                                onClick = {
+                                    startActivity(Intent(this@ExtrasActivity, AuditActivity::class.java))
                                 }
                             )
                         }

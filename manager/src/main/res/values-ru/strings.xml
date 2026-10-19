@@ -67,7 +67,6 @@
     <string name="home_root_description"><![CDATA[Кроме того, Xhizuku может автоматически запускаться при загрузке. Если этого не происходит, проверьте, не ограничивает ли ваша система или сторонние инструменты Xhizuku.<br>Можете обратиться к %s.]]>
 
 Примечание: Xhizuku — это современная замена Shizuku. Пожалуйста, удалите старое официальное приложение Shizuku, чтобы избежать конфликтов.</string>
-    <string name="home_root_description_sui"><![CDATA[Если вы используете Magisk, попробуйте %1$s. Для root-пользователей это в конечном счёте заменит Xhizuku. Приложениям потребуется небольшая доработка для использования %2$s.]]></string>
     <string name="home_root_button_start">Запуск</string>
     <string name="home_root_button_restart">Перезапуск</string>
 

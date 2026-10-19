@@ -27,10 +27,10 @@ subprojects {
 apply from: 'api/manifest.gradle'
 def gitCommitId = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim()
 def gitCommitCount = 1
-def baseVersionName = "3.0.0"
+def baseVersionName = "4.0.0"
 ext {
     // Keep versionCode a plain literal: F-Droid's scanner cannot evaluate
     // computed values (it reported versionCode 0). Bump by hand on release.
-    versionCode = 2
+    versionCode = 4
     versionName = "${baseVersionName}.r${gitCommitCount}.${gitCommitId}"
 }

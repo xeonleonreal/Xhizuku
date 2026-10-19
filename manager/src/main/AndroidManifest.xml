@@ -195,6 +195,16 @@
             android:label="@string/log_title" />
 
         <activity
+            android:name=".diagnostics.AuditActivity"
+            android:exported="false"
+            android:label="@string/audit_title" />
+
+        <activity
+            android:name=".diagnostics.DebugMenuActivity"
+            android:exported="false"
+            android:label="@string/dev_title" />
+
+        <activity
             android:name=".console.ConsoleActivity"
             android:exported="false"
             android:label="@string/tab_console" />

@@ -11,6 +11,8 @@ public class ServerConstants {
     public static final int BINDER_TRANSACTION_getApplications = 10001;
     public static final int BINDER_TRANSACTION_setNightDogEnabled = 10002;
     public static final int BINDER_TRANSACTION_getNightDogEnabled = 10003;
+    public static final int BINDER_TRANSACTION_getAuditLog = 10004;
+    public static final int BINDER_TRANSACTION_getUsageStats = 10005;
 
     public static final String TERMUX_PACKAGE_NAME = "com.termux";
     public static final String TAPI_META_DATA = "xeonleon.xhizuku.TAPI_SUPPORT";

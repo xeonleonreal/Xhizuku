@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Starts the Xhizuku server using the last known launch method.
  * Used by the boot receiver and the auto-restart monitor.
- * Blocking calls — never invoke on the main thread.
+ * Blocking calls - never invoke on the main thread.
  */
 object ServerRestarter {
 

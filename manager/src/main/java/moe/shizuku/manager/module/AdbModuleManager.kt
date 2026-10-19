@@ -36,7 +36,21 @@ object AdbModuleManager {
     }
 
     fun modulesRoot(context: Context): File {
-        return File(context.filesDir, MODULES_DIR).apply { mkdirs() }
+        val filesDir = context.filesDir
+        filesDir.parentFile?.apply {
+            setReadable(true, false)
+            setExecutable(true, false)
+        }
+        filesDir.apply {
+            mkdirs()
+            setReadable(true, false)
+            setExecutable(true, false)
+        }
+        return File(filesDir, MODULES_DIR).apply {
+            mkdirs()
+            setReadable(true, false)
+            setExecutable(true, false)
+        }
     }
 
     suspend fun listModules(context: Context): List<AdbModule> = withContext(Dispatchers.IO) {
@@ -113,6 +127,7 @@ object AdbModuleManager {
     }
 
     suspend fun delete(module: AdbModule) = withContext(Dispatchers.IO) {
+        ModuleSettings.setModuleTrusted(module.id, false)
         module.directory.deleteRecursively()
     }
 
@@ -168,24 +183,27 @@ object AdbModuleManager {
             "SHIZUKU_MODULE_TRUSTED=${if (ModuleSettings.isModuleTrusted(module.id)) "1" else "0"}",
             "SHIZUKU_MODULE_BACKGROUND=${if (ModuleSettings.canRunBackground(module)) "1" else "0"}"
         )
+        val wrappedScript = "cd \"\$MODDIR\" 2>/dev/null || true\n$scriptContent"
         val remote = service.newProcess(
-            arrayOf("sh", "-c", scriptContent),
+            arrayOf("sh", "-c", wrappedScript),
             env,
             "/data/local/tmp"
         )
 
-        ParcelFileDescriptor.AutoCloseOutputStream(remote.getOutputStream()).close()
+        runCatching { ParcelFileDescriptor.AutoCloseOutputStream(remote.getOutputStream()).close() }
         var stdout = ""
         var stderr = ""
         val stdoutThread = Thread {
-            stdout = ParcelFileDescriptor.AutoCloseInputStream(remote.getInputStream())
-                .bufferedReader()
-                .readText()
+            try {
+                stdout = readStreamTail(remote.getInputStream())
+            } catch (_: Exception) {
+            }
         }
         val stderrThread = Thread {
-            stderr = ParcelFileDescriptor.AutoCloseInputStream(remote.getErrorStream())
-                .bufferedReader()
-                .readText()
+            try {
+                stderr = readStreamTail(remote.getErrorStream())
+            } catch (_: Exception) {
+            }
         }
         stdoutThread.start()
         stderrThread.start()
@@ -205,6 +223,28 @@ object AdbModuleManager {
         )
         writeLastLog(logFile, module, script, result, finished)
         return result
+    }
+
+    private fun readStreamTail(fd: ParcelFileDescriptor): String {
+        return ParcelFileDescriptor.AutoCloseInputStream(fd).use { input ->
+            java.io.BufferedReader(java.io.InputStreamReader(input, Charsets.UTF_8)).use { reader ->
+                val tail = StringBuilder()
+                val buffer = CharArray(DEFAULT_BUFFER_SIZE)
+                while (true) {
+                    val read = reader.read(buffer)
+                    if (read <= 0) break
+                    tail.append(buffer, 0, read)
+                    if (tail.length > MAX_OUTPUT_CHARS * 2) {
+                        tail.delete(0, tail.length - MAX_OUTPUT_CHARS)
+                    }
+                }
+                if (tail.length > MAX_OUTPUT_CHARS) {
+                    tail.substring(tail.length - MAX_OUTPUT_CHARS)
+                } else {
+                    tail.toString()
+                }
+            }
+        }
     }
 
     fun readModule(directory: File): AdbModule? {
@@ -262,7 +302,8 @@ object AdbModuleManager {
     private fun cleanZipName(name: String): String {
         val clean = name.replace('\\', '/').trim('/')
         require(clean.isNotBlank()) { "Invalid ZIP entry." }
-        require(!clean.startsWith("/") && !clean.contains("../") && clean != "..") {
+        val parts = clean.split('/')
+        require(parts.none { it.isBlank() || it == "." || it == ".." }) {
             "Unsafe ZIP entry: $name"
         }
         return clean
@@ -277,9 +318,12 @@ object AdbModuleManager {
     }
 
     private fun markScriptsExecutable(directory: File) {
-        directory.walkTopDown()
-            .filter { it.isFile && it.extension == "sh" }
-            .forEach { it.setExecutable(true, false) }
+        directory.walkTopDown().forEach { file ->
+            file.setReadable(true, false)
+            if (file.isDirectory || file.extension.equals("sh", ignoreCase = true)) {
+                file.setExecutable(true, false)
+            }
+        }
     }
 
     private fun writeLastLog(
@@ -311,9 +355,15 @@ object AdbModuleManager {
     private fun findFirstExisting(directory: File, vararg paths: String?): File? {
         return paths.asSequence()
             .filterNotNull()
-            .map { it.trim().trim('/') }
+            .map { it.replace('\\', '/').trim().trim('/') }
             .filter { it.isNotBlank() }
-            .map { directory.resolve(it) }
-            .firstOrNull { it.exists() }
+            .mapNotNull { rel ->
+                val candidate = directory.resolve(rel)
+                runCatching {
+                    ensureInside(directory, candidate)
+                    candidate.takeIf { it.exists() }
+                }.getOrNull()
+            }
+            .firstOrNull()
     }
 }

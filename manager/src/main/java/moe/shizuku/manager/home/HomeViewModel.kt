@@ -10,11 +10,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import moe.shizuku.manager.BuildConfig
 import moe.shizuku.manager.Manifest
+import moe.shizuku.manager.diagnostics.DevSpoof
 import moe.shizuku.manager.model.ServiceStatus
 import moe.shizuku.manager.utils.Logger.LOGGER
 import moe.shizuku.manager.utils.ShizukuSystemApis
 import rikka.lifecycle.Resource
 import rikka.shizuku.Shizuku
+import rikka.shizuku.ShizukuApiConstants
 
 class HomeViewModel : ViewModel() {
 
@@ -23,7 +25,18 @@ class HomeViewModel : ViewModel() {
 
     private fun load(): ServiceStatus {
         if (!Shizuku.pingBinder()) {
-            return ServiceStatus()
+            return if (DevSpoof.spoofOnline()) {
+                ServiceStatus(
+                    uid = 0,
+                    apiVersion = ShizukuApiConstants.SERVER_VERSION,
+                    patchVersion = ShizukuApiConstants.SERVER_PATCH_VERSION,
+                    seContext = "spoofed",
+                    permission = false,
+                    spoofed = true
+                )
+            } else {
+                ServiceStatus()
+            }
         }
 
         val uid = Shizuku.getUid()

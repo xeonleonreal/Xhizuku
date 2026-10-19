@@ -432,7 +432,10 @@ internal fun StatusCard(
 ) {
     val context = LocalContext.current
     val running = status.isRunning
-    val title = if (running) {
+    val shown = running || status.spoofed
+    val title = if (status.spoofed && !running) {
+        stringResource(R.string.dev_spoofed_title, stringResource(R.string.app_name))
+    } else if (running) {
         stringResource(R.string.home_status_service_is_running, stringResource(R.string.app_name))
     } else {
         stringResource(R.string.home_status_service_not_running, stringResource(R.string.app_name))
@@ -442,7 +445,7 @@ internal fun StatusCard(
     }
 
     HomeCard(
-        icon = if (running) R.drawable.ic_server_ok_24dp else R.drawable.ic_server_error_24dp,
+        icon = if (shown) R.drawable.ic_server_ok_24dp else R.drawable.ic_server_error_24dp,
         title = title,
         body = summary
     ) {
@@ -807,7 +810,7 @@ internal fun htmlToPlainText(value: String): String {
 }
 
 internal fun buildServiceSummary(context: android.content.Context, status: ServiceStatus): String {
-    if (!status.isRunning) return ""
+    if (!status.isRunning && !status.spoofed) return ""
 
     val user = if (status.uid == 0) "root" else "adb"
     val version = "${status.apiVersion}.${status.patchVersion}"

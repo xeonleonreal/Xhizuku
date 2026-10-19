@@ -7,23 +7,17 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import moe.shizuku.manager.R
 import moe.shizuku.manager.app.AppActivity
+import moe.shizuku.manager.connector.ShizukuConnectorProvider
 import moe.shizuku.manager.ui.compose.ExpressiveButtonSpec
 import moe.shizuku.manager.ui.compose.ExpressiveButtons
 import moe.shizuku.manager.ui.compose.ExpressiveCard
@@ -31,12 +25,19 @@ import moe.shizuku.manager.ui.compose.MonospaceLog
 import moe.shizuku.manager.ui.compose.ShizukuExpressiveTheme
 import moe.shizuku.manager.ui.compose.ShizukuLazyScaffold
 import rikka.shizuku.Shizuku
+import java.util.concurrent.TimeUnit
+
+private enum class LogSource {
+    APP, SERVER, ACTIVATOR
+}
 
 class ServerLogActivity : AppActivity() {
 
     private var logText by mutableStateOf("")
     private var loading by mutableStateOf(true)
     private var needsAuth by mutableStateOf(false)
+    private var source by mutableStateOf(LogSource.SERVER)
+    private var loadJob: kotlinx.coroutines.Job? = null
 
     private val permissionListener = Shizuku.OnRequestPermissionResultListener { _, grantResult ->
         if (grantResult == PackageManager.PERMISSION_GRANTED) {
@@ -57,7 +58,31 @@ class ServerLogActivity : AppActivity() {
                     title = stringResource(R.string.log_title),
                     onNavigateUp = { finish() }
                 ) {
-                    if (needsAuth) {
+                    item {
+                        ExpressiveButtons(
+                            listOf(
+                                ExpressiveButtonSpec(
+                                    label = R.string.log_source_app,
+                                    icon = R.drawable.ic_outline_info_24,
+                                    primary = source == LogSource.APP,
+                                    onClick = { source = LogSource.APP; loadLog() }
+                                ),
+                                ExpressiveButtonSpec(
+                                    label = R.string.log_source_server,
+                                    icon = R.drawable.ic_server_ok_24dp,
+                                    primary = source == LogSource.SERVER,
+                                    onClick = { source = LogSource.SERVER; loadLog() }
+                                ),
+                                ExpressiveButtonSpec(
+                                    label = R.string.log_source_activator,
+                                    icon = R.drawable.ic_baseline_link_24,
+                                    primary = source == LogSource.ACTIVATOR,
+                                    onClick = { source = LogSource.ACTIVATOR; loadLog() }
+                                )
+                            )
+                        )
+                    }
+                    if (needsAuth && source == LogSource.SERVER) {
                         item {
                             ExpressiveCard(
                                 icon = R.drawable.ic_outline_info_24,
@@ -140,11 +165,20 @@ class ServerLogActivity : AppActivity() {
     }
 
     private fun loadLog() {
+        loadJob?.cancel()
         loading = true
         logText = ""
         needsAuth = false
-        lifecycleScope.launch {
-            val result = withContext(Dispatchers.IO) { collectLog() }
+        val current = source
+        loadJob = lifecycleScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                when (current) {
+                    LogSource.APP -> readLocalLogcat()
+                    LogSource.SERVER -> collectServerLog()
+                    LogSource.ACTIVATOR -> collectActivatorLog()
+                }
+            }
+            if (current != source) return@launch
             if (result == AUTH_REQUIRED) {
                 needsAuth = true
                 logText = ""
@@ -155,9 +189,24 @@ class ServerLogActivity : AppActivity() {
         }
     }
 
-    private fun collectLog(): String {
+    private fun readLocalLogcat(): String {
+        return try {
+            val process = ProcessBuilder("logcat", "-d", "-t", "1000", "-v", "time", "--pid=" + android.os.Process.myPid())
+                .redirectErrorStream(true)
+                .start()
+            if (!process.waitFor(5, TimeUnit.SECONDS)) {
+                process.destroyForcibly()
+                return ""
+            }
+            process.inputStream.bufferedReader().readText().take(60_000)
+        } catch (_: Throwable) {
+            ""
+        }
+    }
+
+    private fun collectServerLog(): String {
         if (!Shizuku.pingBinder()) {
-            return getString(R.string.log_not_running)
+            return readLocalLogcat().ifBlank { getString(R.string.log_not_running) }
         }
         try {
             if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
@@ -166,16 +215,53 @@ class ServerLogActivity : AppActivity() {
         } catch (_: Throwable) {
             return AUTH_REQUIRED
         }
-        val raw = XStatusCollector.runCommand("logcat -d -t 800") ?: return ""
-        return raw.lineSequence()
-            .filter { line -> line.contains("shizuku", ignoreCase = true) }
-            .take(400)
+        var text = runServerLogcatCommand("logcat -d -t 1500 -v time --pid=\$(pidof shizuku_server 2>/dev/null | cut -d' ' -f1)")
+        if (text.isBlank()) {
+            text = runServerLogcatCommand(
+                "logcat -d -t 1500 -v time -s Service:V ClientRecord:V UserServiceRecord:V " +
+                    "ConfigPackageEntry:V ConfigManager:V UserServiceManager:V RemoteProcessHolder:V " +
+                    "BinderSender:V NightDog:V shizuku_server:V shizuku_starter:V"
+            )
+        }
+        if (text.isBlank()) {
+            text = runServerLogcatCommand("logcat -d -t 1500 -v time")
+        }
+        return text
+    }
+
+    private fun runServerLogcatCommand(command: String): String {
+        val result = XStatusCollector.exec(command)
+        val text = result.stdout.trim()
+        if (text.isNotBlank()) {
+            return text.take(60_000)
+        }
+        return result.stderr.trim().take(60_000)
+    }
+
+    private fun collectActivatorLog(): String {
+        return ShizukuConnectorProvider.getActivatorLog()
+            .take(200)
+            .mapNotNull { line ->
+                val parts = line.split("|")
+                if (parts.size != 2) return@mapNotNull null
+                val time = parts[0].toLongOrNull()?.let { formatTime(it) } ?: "??:??:??"
+                "$time ${parts[1]}"
+            }
             .joinToString("\n")
-            .take(60_000)
     }
 
     companion object {
         private const val AUTH_REQUIRED = "\u0000AUTH_REQUIRED\u0000"
+
+        private val timeFormat = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
+
+        private fun formatTime(millis: Long): String {
+            return try {
+                timeFormat.format(java.util.Date(millis))
+            } catch (_: Throwable) {
+                "??:??:??"
+            }
+        }
     }
 
     private fun copyLog() {

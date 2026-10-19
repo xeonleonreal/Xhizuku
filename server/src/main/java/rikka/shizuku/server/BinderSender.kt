@@ -180,7 +180,9 @@ object BinderSender {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            var flags = UID_OBSERVER_GONE or UID_OBSERVER_IDLE or UID_OBSERVER_ACTIVE
+            // Avoid UID_OBSERVER_IDLE: force-stopping a client reports its uid idle during teardown,
+            // which would otherwise re-trigger provider delivery and restart the stopped client.
+            var flags = UID_OBSERVER_GONE or UID_OBSERVER_ACTIVE
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 flags = flags or UID_OBSERVER_CACHED
             }

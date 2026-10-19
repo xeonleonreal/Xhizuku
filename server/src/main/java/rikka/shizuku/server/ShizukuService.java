@@ -91,6 +91,10 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
     private final int managerAppId;
     private Runnable heartbeatRunnable;
 
+    private final ArrayList<String> auditLog = new ArrayList<>();
+    private final java.util.HashMap<Integer, long[]> usageStats = new java.util.HashMap<>();
+    private final Object usageLock = new Object();
+
     public ShizukuService() {
         super();
 
@@ -109,7 +113,7 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
         }
 
         assert ai != null;
-        managerAppId = ai.uid;
+        managerAppId = UserHandleCompat.getAppId(ai.uid);
 
         configManager = getConfigManager();
         clientManager = getClientManager();
@@ -163,7 +167,8 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
 
     @Override
     public boolean checkCallerManagerPermission(String func, int callingUid, int callingPid) {
-        return UserHandleCompat.getAppId(callingUid) == managerAppId;
+        return UserHandleCompat.getAppId(callingUid) == managerAppId
+                && UserHandleCompat.getUserId(callingUid) == 0;
     }
 
     private int checkCallingPermission() {
@@ -229,7 +234,8 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
             throw new SecurityException("Request package " + requestPackageName + "does not belong to uid " + callingUid);
         }
 
-        isManager = MANAGER_APPLICATION_ID.equals(requestPackageName);
+        isManager = MANAGER_APPLICATION_ID.equals(requestPackageName)
+                && UserHandleCompat.getUserId(callingUid) == 0;
 
         if (clientManager.findClient(callingUid, callingPid) == null) {
             synchronized (this) {
@@ -239,6 +245,8 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
                 LOGGER.w("Add client failed");
                 return;
             }
+        } else {
+            clientRecord = clientManager.findClient(callingUid, callingPid);
         }
 
         LOGGER.d("attachApplication: %s %d %d", requestPackageName, callingUid, callingPid);
@@ -259,7 +267,9 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
         reply.putInt(BIND_APPLICATION_SERVER_PATCH_VERSION, ShizukuApiConstants.SERVER_PATCH_VERSION);
         if (!isManager) {
             reply.putBoolean(BIND_APPLICATION_PERMISSION_GRANTED, Objects.requireNonNull(clientRecord).allowed);
-            reply.putBoolean(BIND_APPLICATION_SHOULD_SHOW_REQUEST_PERMISSION_RATIONALE, false);
+            boolean denied = configManager.find(callingUid) != null
+                    && ((ShizukuConfig.PackageEntry) configManager.find(callingUid)).isDenied();
+            reply.putBoolean(BIND_APPLICATION_SHOULD_SHOW_REQUEST_PERMISSION_RATIONALE, denied);
         } else {
             try {
                 Android17Compat.grantRuntimePermission(MANAGER_APPLICATION_ID,
@@ -327,17 +337,27 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
                 requestUid, requestPid, requestCode, Boolean.toString(allowed), Boolean.toString(onetime), expiry);
 
         List<ClientRecord> records = clientManager.findClients(requestUid);
-        List<String> packages = new ArrayList<>();
+        List<String> packages = new ArrayList<>(PackageManagerApis.getPackagesForUidNoThrow(requestUid));
         if (records.isEmpty()) {
             LOGGER.w("dispatchPermissionConfirmationResult: no client for uid %d was found", requestUid);
         } else {
             for (ClientRecord record : records) {
-                packages.add(record.packageName);
                 record.allowed = allowed;
+                pushPermissionState(record, !allowed);
                 if (record.pid == requestPid) {
                     record.dispatchRequestPermissionResult(requestCode, allowed);
                 }
             }
+        }
+
+        String decision;
+        if (allowed) {
+            decision = onetime ? "ALLOW_ONCE" : (expiry > 0L ? "ALLOW_TEMP" : "ALLOW_ALWAYS");
+        } else {
+            decision = onetime ? "DENY_ONCE" : (expiry > 0L ? "DENY_TEMP" : "DENY");
+        }
+        for (String packageName : packages) {
+            audit(requestUid, packageName, decision);
         }
 
         if (!onetime) {
@@ -390,30 +410,15 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
         return 0;
     }
 
-    private boolean isManagerOrAuthorized(int callingUid) {
-        int callingAppId = UserHandleCompat.getAppId(callingUid);
-        if (callingAppId == managerAppId || callingUid == 2000 || callingUid == 0) {
-            return true;
-        }
-        List<String> packages = PackageManagerApis.getPackagesForUidNoThrow(callingUid);
-        return packages.contains("com.termux");
-    }
-
     @Override
     public int getFlagsForUid(int uid, int mask) {
-        if (!isManagerOrAuthorized(Binder.getCallingUid())) {
-            LOGGER.w("getFlagsForUid is allowed to be called only from the manager or authorized clients");
-            return 0;
-        }
+        enforceManagerPermission("getFlagsForUid");
         return getFlagsForUidInternal(uid, mask, true);
     }
 
     @Override
     public void updateFlagsForUid(int uid, int mask, int value) throws RemoteException {
-        if (!isManagerOrAuthorized(Binder.getCallingUid())) {
-            LOGGER.w("updateFlagsForUid is allowed to be called only from the manager or authorized clients");
-            return;
-        }
+        enforceManagerPermission("updateFlagsForUid");
 
         int userId = UserHandleCompat.getUserId(uid);
 
@@ -423,10 +428,9 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
 
             List<ClientRecord> records = clientManager.findClients(uid);
             for (ClientRecord record : records) {
-                if (allowed) {
-                    record.allowed = true;
-                } else {
-                    record.allowed = false;
+                record.allowed = allowed;
+                pushPermissionState(record, denied);
+                if (!allowed) {
                     ActivityManagerApis.forceStopPackageNoThrow(record.packageName, UserHandleCompat.getUserId(record.uid));
                     onPermissionRevoked(record.packageName);
                 }
@@ -463,6 +467,32 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
      *
      * @return true if an expired entry was cleared
      */
+    private void audit(int uid, String packageName, String decision) {
+        String entry = uid + "|" + packageName + "|" + decision + "|" + System.currentTimeMillis();
+        synchronized (auditLog) {
+            auditLog.add(entry);
+            while (auditLog.size() > 200) {
+                auditLog.remove(0);
+            }
+        }
+    }
+
+    private void countTransaction(int uid) {
+        if (UserHandleCompat.getAppId(uid) == managerAppId) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        synchronized (usageLock) {
+            long[] counters = usageStats.get(uid);
+            if (counters == null) {
+                usageStats.put(uid, new long[]{1L, now});
+            } else {
+                counters[0]++;
+                counters[1] = now;
+            }
+        }
+    }
+
     private boolean clearExpiredGrantIfNeeded(int uid) {
         ShizukuConfig.PackageEntry entry = configManager.find(uid);
         if (entry == null || entry.expiry == 0L || entry.expiry > System.currentTimeMillis()) {
@@ -471,6 +501,9 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
         boolean wasAllowed = (entry.flags & ConfigManager.FLAG_ALLOWED) != 0;
         List<ClientRecord> records = clientManager.findClients(uid);
         List<String> packages = PackageManagerApis.getPackagesForUidNoThrow(uid);
+        for (String packageName : packages) {
+            audit(uid, packageName, "EXPIRED");
+        }
         for (ClientRecord record : records) {
             record.allowed = false;
         }
@@ -520,6 +553,22 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
         mainHandler.postDelayed(expirySweepRunnable, 30000L);
     }
 
+    private void pushPermissionState(ClientRecord record, boolean shouldShowRationale) {
+        try {
+            android.os.Bundle reply = new android.os.Bundle();
+            reply.putInt(BIND_APPLICATION_SERVER_UID, OsUtils.getUid());
+            reply.putInt(BIND_APPLICATION_SERVER_VERSION,
+                    record.apiVersion == -1 ? 12 : ShizukuApiConstants.SERVER_VERSION);
+            reply.putInt(BIND_APPLICATION_SERVER_PATCH_VERSION, ShizukuApiConstants.SERVER_PATCH_VERSION);
+            reply.putString(BIND_APPLICATION_SERVER_SECONTEXT, OsUtils.getSELinuxContext());
+            reply.putBoolean(BIND_APPLICATION_PERMISSION_GRANTED, record.allowed);
+            reply.putBoolean(BIND_APPLICATION_SHOULD_SHOW_REQUEST_PERMISSION_RATIONALE, shouldShowRationale);
+            record.client.bindApplication(reply);
+        } catch (Throwable t) {
+            LOGGER.w(t, "Failed to push permission state to uid=%d pid=%d", record.uid, record.pid);
+        }
+    }
+
     private void onPermissionRevoked(String packageName) {
         getUserServiceManager().removeUserServicesForPackage(packageName);
     }
@@ -562,6 +611,7 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
 
     @Override
     public boolean onTransact(int code, Parcel data, Parcel reply, int flags) throws RemoteException {
+        countTransaction(Binder.getCallingUid());
         if (code == ServerConstants.BINDER_TRANSACTION_getApplications) {
             if (UserHandleCompat.getAppId(Binder.getCallingUid()) != managerAppId
                     && checkCallingPermission() != PackageManager.PERMISSION_GRANTED) {
@@ -595,8 +645,45 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
             reply.writeNoException();
             reply.writeInt(configManager.getNightDogEnabled() ? 1 : 0);
             return true;
+        } else if (code == ServerConstants.BINDER_TRANSACTION_getAuditLog) {
+            if (UserHandleCompat.getAppId(Binder.getCallingUid()) != managerAppId) {
+                reply.writeException(new SecurityException("Permission denied"));
+                return true;
+            }
+            data.enforceInterface(ShizukuApiConstants.BINDER_DESCRIPTOR);
+            reply.writeNoException();
+            synchronized (auditLog) {
+                reply.writeStringList(new ArrayList<>(auditLog));
+            }
+            return true;
+        } else if (code == ServerConstants.BINDER_TRANSACTION_getUsageStats) {
+            if (UserHandleCompat.getAppId(Binder.getCallingUid()) != managerAppId) {
+                reply.writeException(new SecurityException("Permission denied"));
+                return true;
+            }
+            data.enforceInterface(ShizukuApiConstants.BINDER_DESCRIPTOR);
+            reply.writeNoException();
+            synchronized (usageLock) {
+                reply.writeInt(usageStats.size());
+                for (java.util.Map.Entry<Integer, long[]> e : usageStats.entrySet()) {
+                    reply.writeInt(e.getKey());
+                    reply.writeLong(e.getValue()[0]);
+                    reply.writeLong(e.getValue()[1]);
+                    reply.writeString(primaryPackageName(e.getKey()));
+                }
+            }
+            return true;
         }
         return super.onTransact(code, data, reply, flags);
+    }
+
+    private String primaryPackageName(int uid) {
+        try {
+            List<String> packages = PackageManagerApis.getPackagesForUidNoThrow(uid);
+            return packages.isEmpty() ? "" : packages.get(0);
+        } catch (Throwable t) {
+            return "";
+        }
     }
 
     void sendBinderToClient() {

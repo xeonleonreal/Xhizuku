@@ -31,6 +31,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.shizuku.manager.R
 import moe.shizuku.manager.app.AppActivity
+import moe.shizuku.manager.diagnostics.DevSpoof
 import moe.shizuku.manager.ui.compose.ShizukuExpressiveTheme
 import moe.shizuku.manager.ui.compose.ShizukuScaffold
 import rikka.shizuku.Shizuku
@@ -163,6 +164,18 @@ class ShizuTestActivity : AppActivity() {
 
     private fun runAutoTest() {
         lifecycleScope.launch {
+            if (moe.shizuku.manager.diagnostics.DevSpoof.spoofOutcomes()) {
+                for (i in 0 until testsList.size) {
+                    testsList[i] = testsList[i].copy(
+                        status = TestStatus.GOOD,
+                        summary = "spoofed",
+                        details = "Spoofed outcome for UI testing",
+                        executionTimeMs = 0L
+                    )
+                }
+                return@launch
+            }
+
             for (i in 0 until testsList.size) {
                 testsList[i] = testsList[i].copy(
                     status = TestStatus.IDLE,
