@@ -23,3 +23,6 @@ This is list of additions that will be updated every major update
 #### Update 3.0.0:
 - Battery exemption - Some phones kills the service without any warning and xhizuku dies. This should help keeping server alive
 - Console tab - You can run shell commands in Xhizuku!
+#### Update 4.0.0:
+- Developer menu, Check logs, Spoof activation, Tools
+- Permission Audit
