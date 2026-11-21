@@ -1,5 +1,8 @@
 # Xhizuku <img src="github/icon.webp" height="40" style="vertical-align: middle;"/>
 
+> [!NOTE]
+> **Project still active**. The reason theres no much updates because...I have no ideas. Feel free to create a Issue with [IDEA] in it. I accept pull requests too.
+
 **Xhizuku** is a fork of **Nightzuku**, maintained by xeonleonreal. It provides a robust, high-performance interface for applications to use system APIs directly with elevated permissions (root/ADB).
 
 This project tracks the latest Android platform developments, including Android 16/17 target stability, introduces a revamped Modern Material 3 Expressive UI using Jetpack Compose, includes a full ADB-backed ZIP modules runner, onboarding wizard for new users, XStatus monitor and Magisk-style bottom menu.
@@ -35,7 +38,8 @@ Upstream project reference: <https://github.com/RikkaApps/Shizuku>
 - [Wear OS Pairing Guide*](docs/wearos-pairing.md)
 - [Android TV Support*](docs/android-tv-support.md)
 - [NightDog Watchdog](docs/nightdog.md)
-- *Please be aware that this is a new fork and I didnt check for these yet
+> [!CAUTION]  
+> *Please be aware that this is a fork and I didnt check for these yet
 
 ## Background
 
